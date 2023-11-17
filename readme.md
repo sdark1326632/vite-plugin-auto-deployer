@@ -11,20 +11,20 @@ Vite 自动化发布插件，解决频繁手动操作服务器的过程，彻底
 
 ```sh
 # npm
-npm install -D vite-plugin-deployer 
+npm install -D vite-plugin-auto-deployer 
 
 # yarn
-yarn add -D vite-plugin-deployer
+yarn add -D vite-plugin-auto-deployer
 
 # pnpm
-pnpm add -D vite-plugin-deployer
+pnpm add -D vite-plugin-auto-deployer
 ```
 
 ## 使用教程
 插件会自动读取outDir目录，更加灵活
 ```js
 // vite.config.js
-import AutoDeployer from "vite-plugin-deployer";
+import AutoDeployer from "vite-plugin-auto-deployer";
 
 // 定义服务器相关信息
 const serverInfo = {
