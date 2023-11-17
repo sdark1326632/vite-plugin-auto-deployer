@@ -1,0 +1,33 @@
+{
+  "name": "vite-plugin-deployer",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/qq_1326632/vite-plugin-deployer.git"
+  },
+  "homepage": "http://www.sdark.store",
+  "keywords": [
+    "vite",
+    "server",
+    "build",
+    "auto",
+    "upload",
+    "ftp",
+    "自动部署",
+    "自动上传",
+    "发布"
+  ],
+  "author": "ZhenNan.Shi",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "chalk": "4.1.2",
+    "ora": "5.4.1",
+    "scp2": "0.5.0",
+    "inquirer": "8.2.6"
+  }
+}
