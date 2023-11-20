@@ -1,11 +1,11 @@
-# vite-plugin-deployer
+# vite-plugin-auto-deployer
 
 Vite 自动化发布插件，解决频繁手动操作服务器的过程，彻底解放你的双手!!!
 
 从此让你不必再害怕 rm -rf \* ，你懂得...
 
 
- ![](./images/auto-delop.png)
+ ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/auto-delop.png)
 
 ## 安装
 
@@ -38,15 +38,20 @@ const serverInfo = {
   path: "/data/website" // 需要上传至的服务器目录
 };
 
+// 按需加载插件
+const plugins = []
+if (process.env.NODE_ENV === 'production') {
+  plugins.push(AutoDeployer(serverInfo))
+}
 export default {
   // ...
-  plugins: [AutoDeployer(serverInfo)]
+  plugins
 };
 ```
 
 ## 使用截图
 
 ##### 用户名密码为空，输入完会自动执行
- ![](./images/question.png)
+ ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/question.png)
 
 完结，撒花~~~~~~~~~~~~~~~
