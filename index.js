@@ -9,47 +9,65 @@ module.exports = function (options) {
   return {
     name: "vite-plugin-auto-server-upload",
     configResolved(resolvedCofnig) {
+      const env = resolvedCofnig.env.MODE
+      if (env === 'development') {
+        return
+      }
+      if (Array.isArray(options) && !!options.length) {
+        options = options.find(item => item.mode == env)
+        if (!options) {
+          console.log('未找到相关环境，请手动上传~')
+          return
+        }
+      }
       options.outDir = resolvedCofnig.build.outDir;
       options.readyTimeout = 5000;
     },
     async closeBundle() {
+      console.log("\n");
       const { password, username } = options;
-      if (!username || !password) {
-        console.log('\n')
-        const answers = await inquirer.prompt([
-          {
-            type: "input",
-            name: "username",
-            default: "root",
-            message: "请输入服务器用户名",
-            validate: (val) => {
-              if (!val) {
-                return "请输入服务器用户名";
-              }
-              return true;
-            }
-          },
-          {
-            type: "password",
-            name: "password",
-            message: "请输入服务器密码",
-            validate: (val) => {
-              if (!val) {
-                return "请输入服务器密码";
-              }
-              return true;
-            }
-          }
-        ]);
+      const question = [];
 
-        options.username = answers.username;
-        options.password = answers.password;
+      if (!username) {
+        question.push({
+          type: "input",
+          name: "username",
+          default: "root",
+          message: "请输入服务器用户名",
+          validate: (val) => {
+            if (!val) {
+              return "请输入服务器用户名";
+            }
+            return true;
+          }
+        });
+      }
+
+      if (!password) {
+        question.push({
+          type: "password",
+          name: "password",
+          message: "请输入服务器密码",
+          validate: (val) => {
+            if (!val) {
+              return "请输入服务器密码";
+            }
+            return true;
+          }
+        });
+      }
+
+      const answers = await inquirer.prompt(question);
+      if (answers.username) {
+        options.username = answers.username
+      }
+
+      if (answers.password) {
+        options.password = answers.password
       }
       conn.connect(options);
       conn.on("ready", () => onReady(options));
       conn.on("error", onError);
-      conn.on("end", onEnd);
-      conn.on("close", onClose);
     }
   };
 };
@@ -57,7 +75,9 @@ module.exports = function (options) {
 function onReady(options) {
   const { host, port, path, outDir } = options;
   console.log(`服务器连接已就绪: ${host}:${port}`);
+
   if (!path) {
+    console.log("请配置远程目录~");
     console.log("连接已关闭");
     conn.end();
     return false;
@@ -92,13 +112,10 @@ function onReady(options) {
 }
 
 function onError(e) {
-  console.log("error", e);
-}
-
-function onEnd() {
-  console.log("end");
-}
-
-function onClose() {
-  console.log("close");
+  console.error("连接失败!");
+  if (e.message.includes('authentication')) {
+    console.error('请检查用户名密码是否正确!')
+  } else {
+    console.error(e.message)
+  }
 }
