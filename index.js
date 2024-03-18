@@ -9,15 +9,15 @@ module.exports = function (options) {
   return {
     name: "vite-plugin-auto-server-upload",
     configResolved(resolvedCofnig) {
-      const env = resolvedCofnig.env.MODE
-      if (env === 'development') {
-        return
+      const env = resolvedCofnig.env.MODE;
+      if (env === "development") {
+        return;
       }
       if (Array.isArray(options) && !!options.length) {
-        options = options.find(item => item.mode == env)
+        options = options.find((item) => item.mode == env);
         if (!options) {
-          console.log('未找到相关环境，请手动上传~')
-          return
+          console.log(chalk.red("未找到相关环境，请手动上传~"));
+          return;
         }
       }
       options.outDir = resolvedCofnig.build.outDir;
@@ -59,11 +59,11 @@ module.exports = function (options) {
 
       const answers = await inquirer.prompt(question);
       if (answers.username) {
-        options.username = answers.username
+        options.username = answers.username;
       }
 
       if (answers.password) {
-        options.password = answers.password
+        options.password = answers.password;
       }
       conn.connect(options);
       conn.on("ready", () => onReady(options));
@@ -77,8 +77,8 @@ function onReady(options) {
   console.log(`服务器连接已就绪: ${host}:${port}`);
 
   if (!path) {
-    console.log("请配置远程目录~");
-    console.log("连接已关闭");
+    console.log(chalk.red("请配置远程目录~"));
+    console.log(chalk.red("连接已关闭"));
     conn.end();
     return false;
   }
@@ -95,9 +95,8 @@ function onReady(options) {
             console.log(chalk.red("上传失败..."));
             throw err;
           } else {
-            console.log(
-              chalk.green("已自动上传至服务器! \n✿    ✿    ✿    ✿    ✿")
-            );
+            console.log(chalk.green("已自动上传至服务器! \n"));
+            console.log(chalk.green("✿    ✿    ✿    ✿    ✿"));
           }
           conn.end();
         });
@@ -112,10 +111,10 @@ function onReady(options) {
 }
 
 function onError(e) {
-  console.error("连接失败!");
-  if (e.message.includes('authentication')) {
-    console.error('请检查用户名密码是否正确!')
+  console.log(chalk.red("连接失败!"));
+  if (e.message.includes("authentication")) {
+    console.log(chalk.red("请检查用户名密码是否正确!"));
   } else {
-    console.error(e.message)
+    console.log(chalk.red(e.message));
   }
 }
