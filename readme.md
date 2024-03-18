@@ -37,20 +37,19 @@ pnpm add -D vite-plugin-auto-deployer
 // vite.config.js
 import autoDeployer from "vite-plugin-auto-deployer";
 
-// 单服务器模式
+// 单服务器
 const serverInfo = {
   name: "测试环境",
   mode: "staging", // 配置对应环境
   host: "101.43.164.172", // 主机地址
   port: 22, // 端口
-  // 用户名密码按个人所需是否记住,非必须，
-  // 不填会提问，常用于生产环境，避免服务器信息泄露
-  // username: "root",
-  // password: "xxxx",
-  path: "/data/website" // 需要上传至的服务器目录
+  // 避免服务器信息泄露，用户名、密码按个人所需是否记住,非必填，程序会提示进行
+  username: "root",
+  password: "xxxx",
+  path: "/data/website_test" // 需要上传至的服务器目录
 };
 
-// 列表模式
+// 服务器列表
 const serverList = [
   {
     name: "测试",
@@ -58,15 +57,15 @@ const serverList = [
     host: "101.43.164.172",
     port: 22,
     username: "root",
-    password: "test1",
-    path: "/data/tibet_website"
+    password: "testxxxxxxx",  
+    path: "/data/website_test"
   },
   {
     name: "生产环境部署",
     mode: "production",
     host: "101.43.164.172",
     port: 22,
-    path: "/data/tibet_website"
+    path: "/data/website_prod"
   }
 ];
 
@@ -74,7 +73,8 @@ const serverList = [
 export default ({ mode, command }) => {
   const config = {
     base: "/",
-    plugins: [autoDeployer(serverInfo)] // 配置单个或列表
+    // 配置单个serverInfo or 列表serverList 
+    plugins: [autoDeployer(serverInfo)] 
   };
   return defineConfig(config);
 };
@@ -82,7 +82,7 @@ export default ({ mode, command }) => {
 
 ## 使用截图
 
-##### 🔐 用户名或密码为空时，提示输入，输入完会自动执行
+##### 🔐 用户名或密码为空时，提示输入，输入完会自动执行   ps:默认用户名为root
 
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/question.png)
 
