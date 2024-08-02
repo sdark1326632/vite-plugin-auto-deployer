@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-auto-deployer",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "main": "index.js",
   "license": "MIT",
   "type": "commonjs",
@@ -16,6 +16,7 @@
     "auto",
     "upload",
     "ftp",
+    "ssh",
     "自动部署",
     "自动上传",
     "发布"
