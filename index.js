@@ -82,6 +82,16 @@ function onReady(options) {
     conn.end();
     return false;
   }
+
+  // 检测路径是否是系统目录
+  const warnPath = ['/','/bin','/boot','/dev','/etc','/home','/lib','/opt','/proc','/root','/run','/sbin','/srv','/sys','/var']
+  if (warnPath.includes(path)) {
+    console.log(chalk.red("您当前正在做操系统目录，程序已终止，请手动操作~"));
+    console.log(chalk.red("连接已关闭"));
+    conn.end();
+    return false;
+  }
+  
   conn.exec(`rm -rf ${path}/*`, (err, stream) => {
     if (err) throw err;
     console.log(`清空 ${path} 目录成功!`);
