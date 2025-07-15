@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "type": "commonjs",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://gitee.com/qq_1326632/vite-plugin-deployer.git"
