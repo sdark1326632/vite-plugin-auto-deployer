@@ -51,7 +51,7 @@ const serverInfo = {
   // to avoid server information leakage please remember your username and password according to personal needs if they are not required the program will prompt you to proceed
   username: "root",
   password: "xxxx",
-  path: "/data/website_test" // 需要上传至的服务器目录
+  path: "/data/website_test" // the server directory that needs to be uploaded to
 };
 
 // server list
