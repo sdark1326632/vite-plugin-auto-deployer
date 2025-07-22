@@ -44,14 +44,16 @@ import autoDeployer from "vite-plugin-auto-deployer";
 
 // single server
 const serverInfo = {
-  name: "测试环境",
-  mode: "staging", // configure the corresponding environment
-  host: "101.43.164.172", // host
-  port: 22, // port
+  name: "testing environment",
+  // configure the corresponding environment
+  mode: "staging", 
+  host: "101.43.164.172", 
+  port: 22, 
   // to avoid server information leakage please remember your username and password according to personal needs if they are not required the program will prompt you to proceed
   username: "root",
   password: "xxxx",
-  path: "/data/website_test" // the server directory that needs to be uploaded to
+  // the server directory that needs to be uploaded to
+  path: "/data/website_test" 
 };
 
 // server list
@@ -75,36 +77,30 @@ const serverList = [
 ];
 
 // vite configuration
-export default ({ mode, command }) => {
-  const config = {
-    base: "/",
-    // configure a single server info or list server list
-    plugins: [autoDeployer(serverInfo)] 
-  };
-  return defineConfig(config);
-};
+export default defineConfig({
+  plugins: [vue(), autoDeployer(serverInfo)]
+});
 ```
 
 ## Use screenshots
 
-##### 🔐 When the username or password is empty, it will be prompted to enter, and PS: The default username is root
+##### 🔐 When the username or password is empty, it will be prompted to enter
 
+
+###### the default username is root
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/1.png)
 
+###### hidden password input
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/2.png)
 
+###### upload directory check
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/3.png)
 
+###### upload completion prompt
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
 
+⭐⭐⭐⭐⭐
+
+done sprinkle flowers
+
 🎉🎉🎉🎉🎉🎉🎉🎉🎉
-
-Finish, sprinkle flowers
-
-⭐⭐⭐⭐⭐
-
-### If you think this plugin is okay, please star
-
-### Your support is the driving force for me to move forward!~
-
-⭐⭐⭐⭐⭐
