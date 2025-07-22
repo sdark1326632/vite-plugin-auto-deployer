@@ -8,7 +8,8 @@
 
 👀 So you don't have to be afraid of rm -rf * anymore, you know... 
 
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/auto-delop.png)
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
+
 
 ## 🛠️ Installation.
 

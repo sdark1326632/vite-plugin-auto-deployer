@@ -8,7 +8,7 @@
 
 👀 从此让你不必再害怕 rm -rf \* ，你懂得...
 
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/auto-delop.png)
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
 
 ## 🛠️ 安装
 
