@@ -17,6 +17,7 @@ module.exports = function (options) {
         options = options.find((item) => item.mode == env);
         if (!options) {
           console.log(chalk.red("未找到相关环境，请手动上传~"));
+          console.log(chalk.red("\nno relevant environment found please upload manually"));
           return;
         }
       }
@@ -33,10 +34,10 @@ module.exports = function (options) {
           type: "input",
           name: "username",
           default: "root",
-          message: "请输入服务器用户名",
+          message: "请输入服务器用户名 \n please enter the server username",
           validate: (val) => {
             if (!val) {
-              return "请输入服务器用户名";
+              return "请输入服务器用户名 \n please enter the server username";
             }
             return true;
           }
@@ -47,10 +48,10 @@ module.exports = function (options) {
         question.push({
           type: "password",
           name: "password",
-          message: "请输入服务器密码",
+          message: "请输入服务器密码 \n please enter the server password",
           validate: (val) => {
             if (!val) {
-              return "请输入服务器密码";
+              return "请输入服务器密码 \n please enter the server password";
             }
             return true;
           }
@@ -74,11 +75,12 @@ module.exports = function (options) {
 
 function onReady(options) {
   const { host, port, path, outDir } = options;
-  console.log(`服务器连接已就绪: ${host}:${port}`);
+  console.log(`\n服务器连接已就绪: ${host}:${port}\nthe server connection is ready: ${host}:${port} \n`);
 
   if (!path) {
-    console.log(chalk.red("请配置远程目录~"));
-    console.log(chalk.red("连接已关闭"));
+    console.log(chalk.red("请配置远程目录~ \n please configure the remote directory~ \n"));
+    
+    console.log(chalk.red("连接已关闭 \nconnection closed"));
     conn.end();
     return false;
   }
@@ -87,27 +89,29 @@ function onReady(options) {
   const warnPath = ['/','/bin','/boot','/dev','/etc','/home','/lib','/opt','/proc','/root','/run','/sbin','/srv','/sys','/var','/*']
   
   if (warnPath.includes(path) || path.includes('*')) {
-    console.log(chalk.red("您当前正在做操系统目录，程序已终止，请手动操作~"));
-    console.log(chalk.red("连接已关闭"));
+    console.log(chalk.red("您当前正在做操系统目录，程序已终止，请手动操作~ \nyou are currently operating the system directory and the program has terminated please manually operate \n"));
+
+    console.log(chalk.red("连接已关闭 \n connection closed"));
+
     conn.end();
     return false;
   }
   
   conn.exec(`rm -rf ${path}/*`, (err, stream) => {
     if (err) throw err;
-    console.log(`清空 ${path} 目录成功!`);
+    console.log(`清空 ${path} 目录成功!\nempty  ${path} catalog successful! \n`);
     stream
       .on("close", (code, signal) => {
-        const spinner = ora(`正在上传 ${outDir} 目录内文件...`);
+        const spinner = ora(`uploading ${outDir} files in the directory...`);
         spinner.start();
         scpClient.scp(`./${outDir}`, options, (err) => {
           spinner.stop();
           if (err) {
             console.log(chalk.red("上传失败..."));
+            console.log(chalk.red("\nupload failed..."));
             throw err;
           } else {
-            console.log(chalk.green("已自动上传至服务器! \n"));
-            console.log(chalk.green("✿    ✿    ✿    ✿    ✿"));
+            console.log(chalk.green("已自动上传至服务器! \n \nautomatically uploaded to the server! \n  \n🚀🚀🚀 success ~ \n\n\n"));
           }
           conn.end();
         });
@@ -122,10 +126,12 @@ function onReady(options) {
 }
 
 function onError(e) {
-  console.log(chalk.red("连接失败!"));
+  console.log(chalk.red("\n连接失败\n"));
+  console.log(chalk.red("connection failed:"));
   if (e.message.includes("authentication")) {
-    console.log(chalk.red("请检查用户名密码是否正确!"));
+    console.log(chalk.red("\n请检查用户名密码是否正确!"));
+    console.log(chalk.red("please check if the username and password are correct!"));
   } else {
-    console.log(chalk.red(e.message));
+    console.log(chalk.red(`\n${e.message}`));
   }
 }

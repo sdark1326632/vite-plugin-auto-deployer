@@ -88,7 +88,14 @@ export default ({ mode, command }) => {
 
 ##### 🔐 用户名或密码为空时，提示输入，输入完会自动执行   ps:默认用户名为root
 
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/question.png)
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/1.png)
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/2.png)
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/3.png)
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
 
 🎉🎉🎉🎉🎉🎉🎉🎉🎉
 

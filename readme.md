@@ -88,7 +88,13 @@ export default ({ mode, command }) => {
 
 ##### 🔐 When the username or password is empty, it will be prompted to enter, and PS: The default username is root
 
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/question.png)
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/1.png)
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/2.png)
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/3.png)
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
 
 🎉🎉🎉🎉🎉🎉🎉🎉🎉
 
