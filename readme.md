@@ -1,6 +1,6 @@
 # vite-plugin-auto-deployer
 
-[English](./readme.md) | [中文说明](./README.zh-CN.md)
+[English](https://gitee.com/qq_1326632/vite-plugin-auto-deployer/blob/master/readme.md) | [中文说明](https://gitee.com/qq_1326632/vite-plugin-auto-deployer/blob/master/README.zh-CN.md)
 
 👨‍💻 Vite automates the release of plugins that solve the process of frequent manual server operation
 

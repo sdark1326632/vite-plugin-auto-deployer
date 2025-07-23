@@ -1,6 +1,6 @@
 # vite-plugin-auto-deployer
 
-[English](./readme.md) | [中文说明](././README.zh-CN.md)
+[English](https://gitee.com/qq_1326632/vite-plugin-auto-deployer/blob/master/readme.md) | [中文说明](https://gitee.com/qq_1326632/vite-plugin-auto-deployer/blob/master/README.zh-CN.md)
 
 👨‍💻 Vite 自动化发布插件，解决频繁手动操作服务器的过程
 
