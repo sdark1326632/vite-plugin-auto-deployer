@@ -1,6 +1,6 @@
 # vite-plugin-auto-deployer
 
-[English](./readme.md) | [中文说明](./readme-zh.md)
+[English](./readme.md) | [中文说明](././README.zh-CN.md)
 
 👨‍💻 Vite 自动化发布插件，解决频繁手动操作服务器的过程
 
