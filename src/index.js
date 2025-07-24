@@ -5,12 +5,10 @@ const scpClient = require("scp2");
 let Client = require("ssh2").Client;
 let conn = new Client();
 
-
-
 module.exports = function (options) {
   let defaultConfig = {
-  readyTimeout: 5000
-}
+    readyTimeout: 5000
+  };
   return {
     name: "vite-plugin-auto-deployer",
     configResolved(resolvedCofnig) {
@@ -20,23 +18,30 @@ module.exports = function (options) {
     },
     async closeBundle() {
       console.log("\n");
-      const { env } = defaultConfig
+      const { env } = defaultConfig;
       if (env === "development") {
         return;
       }
       if (Array.isArray(options) && !!options.length) {
         options = options.find((item) => item.mode == env);
         if (!options) {
-          console.log(chalk.red("未找到相关环境，请手动上传~\nno relevant environment found please upload manually \n"));
+          console.log(
+            chalk.red(
+              "未找到相关环境，请手动上传~\nno relevant environment found please upload manually \n"
+            )
+          );
           return;
         }
       }
 
       if (options.name) {
-      console.log(chalk.blue(`即将上传至： ${options.name} \nupcoming upload to: ${options.name} \n`))
-
+        console.log(
+          chalk.blue(
+            `即将上传至： ${options.name} \nupcoming upload to: ${options.name} \n`
+          )
+        );
       }
-      
+
       const { password, username } = options;
       const question = [];
 
@@ -77,7 +82,7 @@ module.exports = function (options) {
       if (answers.password) {
         options.password = answers.password;
       }
-      let megerOption = {...options, ...defaultConfig}
+      let megerOption = { ...options, ...defaultConfig };
 
       conn.connect(megerOption);
       conn.on("ready", () => onReady(megerOption));
@@ -88,31 +93,58 @@ module.exports = function (options) {
 
 function onReady(options) {
   const { host, port, path, outDir } = options;
-  console.log(`\n服务器连接已就绪: ${host}:${port}\nthe server connection is ready: ${host}:${port} \n`);
+  console.log(
+    `\n服务器连接已就绪: ${host}:${port}\nthe server connection is ready: ${host}:${port} \n`
+  );
 
   if (!path) {
-    console.log(chalk.red("请配置远程目录~ \n please configure the remote directory~ \n"));
-    
+    console.log(
+      chalk.red("请配置远程目录~ \n please configure the remote directory~ \n")
+    );
+
     console.log(chalk.red("连接已关闭 \nconnection closed"));
     conn.end();
     return false;
   }
 
   // 检测路径是否是系统目录
-  const warnPath = ['/','/bin','/boot','/dev','/etc','/home','/lib','/opt','/proc','/root','/run','/sbin','/srv','/sys','/var','/*']
-  
-  if (warnPath.includes(path) || path.includes('*')) {
-    console.log(chalk.red("您当前正在做操系统目录，程序已终止，请手动操作~ \nyou are currently operating the system directory and the program has terminated please manually operate \n"));
+  const warnPath = [
+    "/",
+    "/bin",
+    "/boot",
+    "/dev",
+    "/etc",
+    "/home",
+    "/lib",
+    "/opt",
+    "/proc",
+    "/root",
+    "/run",
+    "/sbin",
+    "/srv",
+    "/sys",
+    "/var",
+    "/*"
+  ];
+
+  if (warnPath.includes(path) || path.includes("*")) {
+    console.log(
+      chalk.red(
+        "您当前正在做操系统目录，程序已终止，请手动操作~ \nyou are currently operating the system directory and the program has terminated please manually operate \n"
+      )
+    );
 
     console.log(chalk.red("连接已关闭 \n connection closed"));
 
     conn.end();
     return false;
   }
-  
+
   conn.exec(`rm -rf ${path}/*`, (err, stream) => {
     if (err) throw err;
-    console.log(`清空 ${path} 目录成功!\nempty  ${path} catalog successful! \n`);
+    console.log(
+      `清空 ${path} 目录成功!\nempty  ${path} catalog successful! \n`
+    );
     stream
       .on("close", (code, signal) => {
         const spinner = ora(`uploading ${outDir} files in the directory...`);
@@ -124,7 +156,11 @@ function onReady(options) {
             console.log(chalk.red("\nupload failed..."));
             throw err;
           } else {
-            console.log(chalk.green("已自动上传至服务器!\nautomatically uploaded to the server! \n\n上传成功 ~ \n🚀🚀🚀 success ~ \n"));
+            console.log(
+              chalk.green(
+                "已自动上传至服务器!\nautomatically uploaded to the server! \n\n上传成功 ~ \n🚀🚀🚀 success ~ \n"
+              )
+            );
           }
           conn.end();
         });
@@ -143,7 +179,9 @@ function onError(e) {
   console.log(chalk.red("connection failed:"));
   if (e.message.includes("authentication")) {
     console.log(chalk.red("\n请检查用户名密码是否正确!"));
-    console.log(chalk.red("please check if the username and password are correct!"));
+    console.log(
+      chalk.red("please check if the username and password are correct!")
+    );
   } else {
     console.log(chalk.red(`\n${e.message}`));
   }
