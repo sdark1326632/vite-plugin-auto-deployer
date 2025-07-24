@@ -1,10 +1,10 @@
 {
   "name": "vite-plugin-auto-deployer",
   "version": "1.2.3",
-  "main": "index.js",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
   "license": "MIT",
   "type": "commonjs",
-  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://gitee.com/qq_1326632/vite-plugin-deployer.git"

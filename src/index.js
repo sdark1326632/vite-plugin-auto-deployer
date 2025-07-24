@@ -5,27 +5,38 @@ const scpClient = require("scp2");
 let Client = require("ssh2").Client;
 let conn = new Client();
 
+
+
 module.exports = function (options) {
+  let defaultConfig = {
+  readyTimeout: 5000
+}
   return {
-    name: "vite-plugin-auto-server-upload",
+    name: "vite-plugin-auto-deployer",
     configResolved(resolvedCofnig) {
       const env = resolvedCofnig.env.MODE;
+      defaultConfig.env = env;
+      defaultConfig.outDir = resolvedCofnig.build.outDir;
+    },
+    async closeBundle() {
+      console.log("\n");
+      const { env } = defaultConfig
       if (env === "development") {
         return;
       }
       if (Array.isArray(options) && !!options.length) {
         options = options.find((item) => item.mode == env);
         if (!options) {
-          console.log(chalk.red("未找到相关环境，请手动上传~"));
-          console.log(chalk.red("\nno relevant environment found please upload manually"));
+          console.log(chalk.red("未找到相关环境，请手动上传~\nno relevant environment found please upload manually \n"));
           return;
         }
       }
-      options.outDir = resolvedCofnig.build.outDir;
-      options.readyTimeout = 5000;
-    },
-    async closeBundle() {
-      console.log("\n");
+
+      if (options.name) {
+      console.log(chalk.blue(`即将上传至： ${options.name} \nupcoming upload to: ${options.name} \n`))
+
+      }
+      
       const { password, username } = options;
       const question = [];
 
@@ -66,8 +77,10 @@ module.exports = function (options) {
       if (answers.password) {
         options.password = answers.password;
       }
-      conn.connect(options);
-      conn.on("ready", () => onReady(options));
+      let megerOption = {...options, ...defaultConfig}
+
+      conn.connect(megerOption);
+      conn.on("ready", () => onReady(megerOption));
       conn.on("error", onError);
     }
   };
