@@ -124,7 +124,7 @@ function onReady(options) {
             console.log(chalk.red("\nupload failed..."));
             throw err;
           } else {
-            console.log(chalk.green("已自动上传至服务器! \n \nautomatically uploaded to the server! \n  \n🚀🚀🚀 success ~ \n\n\n"));
+            console.log(chalk.green("已自动上传至服务器!\nautomatically uploaded to the server! \n\n上传成功 ~ \n🚀🚀🚀 success ~ \n"));
           }
           conn.end();
         });
