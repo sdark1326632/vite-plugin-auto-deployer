@@ -84,20 +84,32 @@ export default defineConfig({
 
 ## Use screenshots
 
-##### 🔐 When the username or password is empty, it will be prompted to enter
-
-
-###### the default username is root
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/1.png)
 
 ###### hidden password input
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/2.png)
 
-###### upload directory check
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/3.png)
 
-###### upload completion prompt
+###### mandatory verification prompt
+
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/1.png)
+
+
+
+###### security directory check
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/2.png)
+
+
+###### password error
+
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
+
+
+
+###### upload completion prompt
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/5.png)
 
 ⭐⭐⭐⭐⭐
 

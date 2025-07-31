@@ -36,6 +36,7 @@ pnpm add -D vite-plugin-auto-deployer
 ###### -[✔] 🔐 主动询问用户名、密码，对服务器信息更安全
 
 # 使用教程
+##### tips: 选填配置  username:root  port: 22 
 
 ```js
 // vite.config.js
@@ -44,6 +45,7 @@ import autoDeployer from "vite-plugin-auto-deployer";
 // 单服务器
 const serverInfo = {
   // 配置对应环境
+  name:'测试环境',
   mode: "staging",
   host: "101.43.164.172",
   port: 22,
@@ -82,23 +84,32 @@ export default defineConfig({
 
 ## 使用截图
 
-##### 🔐 用户名或密码为空时，提示输入，输入完会自动执行
-
-###### 默认用户名为 root
-
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/1.png)
 
 ###### 隐藏式密码输入
 
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/3.png)
+
+###### 必填校验提示
+
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/1.png)
+
+
+
+###### 安全目录检查
+
 ![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/2.png)
 
-###### 上传目录检查
 
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/3.png)
+###### 密码错误
+
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
+
+
 
 ###### 上传完成提示
 
-![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
+![](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/5.png)
 
 ⭐⭐⭐⭐⭐
 

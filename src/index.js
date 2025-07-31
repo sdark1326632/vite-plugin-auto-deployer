@@ -5,10 +5,11 @@ const scpClient = require("scp2");
 let Client = require("ssh2").Client;
 let conn = new Client();
 
+let defaultConfig = {
+  readyTimeout: 5000
+};
+
 module.exports = function (options) {
-  let defaultConfig = {
-    readyTimeout: 5000
-  };
   return {
     name: "vite-plugin-auto-deployer",
     configResolved(resolvedCofnig) {
@@ -18,10 +19,12 @@ module.exports = function (options) {
     },
     async closeBundle() {
       console.log("\n");
-      const { env } = defaultConfig;
-      if (env === "development") {
+
+      // 是否是开发环境
+      if (isDev(defaultConfig)) {
         return;
       }
+
       if (Array.isArray(options) && !!options.length) {
         options = options.find((item) => item.mode == env);
         if (!options) {
@@ -34,6 +37,28 @@ module.exports = function (options) {
         }
       }
 
+      defaultConfig = { ...options, ...defaultConfig };
+
+      // 检查必填项
+      if (!checkRequiredFields(defaultConfig)) {
+        console.log(
+          chalk.red(
+            "\n✖️ 缺少必填项，请手动上传！ \nmissing required fields please upload manually\n"
+          )
+        );
+        return;
+      }
+
+      // 检测是否为安全目录
+      if (isDangerDir(defaultConfig)) {
+        console.log(
+          chalk.red(
+            "\n✖️ 非安全目录，请手动上传！ \nnon-secure directory please upload manually\n"
+          )
+        );
+        return;
+      }
+
       if (options.name) {
         console.log(
           chalk.blue(
@@ -42,50 +67,18 @@ module.exports = function (options) {
         );
       }
 
-      const { password, username } = options;
-      const question = [];
-
-      if (!username) {
-        question.push({
-          type: "input",
-          name: "username",
-          default: "root",
-          message: "请输入服务器用户名 \n please enter the server username",
-          validate: (val) => {
-            if (!val) {
-              return "请输入服务器用户名 \n please enter the server username";
-            }
-            return true;
-          }
-        });
+      // 检测登录信息
+      if (!await checkLoginInfo(defaultConfig)) {
+        console.log(
+          chalk.red(
+            "\n✖️ 登录信息不完整，请手动上传！ \nlogin information incomplete please upload manually\n"
+          )
+        );
+        return;
       }
 
-      if (!password) {
-        question.push({
-          type: "password",
-          name: "password",
-          message: "请输入服务器密码 \n please enter the server password",
-          validate: (val) => {
-            if (!val) {
-              return "请输入服务器密码 \n please enter the server password";
-            }
-            return true;
-          }
-        });
-      }
-
-      const answers = await inquirer.prompt(question);
-      if (answers.username) {
-        options.username = answers.username;
-      }
-
-      if (answers.password) {
-        options.password = answers.password;
-      }
-      let megerOption = { ...options, ...defaultConfig };
-
-      conn.connect(megerOption);
-      conn.on("ready", () => onReady(megerOption));
+      conn.connect(defaultConfig);
+      conn.on("ready", () => onReady(defaultConfig));
       conn.on("error", onError);
     }
   };
@@ -96,49 +89,6 @@ function onReady(options) {
   console.log(
     `\n服务器连接已就绪: ${host}:${port}\nthe server connection is ready: ${host}:${port} \n`
   );
-
-  if (!path) {
-    console.log(
-      chalk.red("请配置远程目录~ \n please configure the remote directory~ \n")
-    );
-
-    console.log(chalk.red("连接已关闭 \nconnection closed"));
-    conn.end();
-    return false;
-  }
-
-  // 检测路径是否是系统目录
-  const warnPath = [
-    "/",
-    "/bin",
-    "/boot",
-    "/dev",
-    "/etc",
-    "/home",
-    "/lib",
-    "/opt",
-    "/proc",
-    "/root",
-    "/run",
-    "/sbin",
-    "/srv",
-    "/sys",
-    "/var",
-    "/*"
-  ];
-
-  if (warnPath.includes(path) || path.includes("*")) {
-    console.log(
-      chalk.red(
-        "您当前正在做操系统目录，程序已终止，请手动操作~ \nyou are currently operating the system directory and the program has terminated please manually operate \n"
-      )
-    );
-
-    console.log(chalk.red("连接已关闭 \n connection closed"));
-
-    conn.end();
-    return false;
-  }
 
   conn.exec(`rm -rf ${path}/*`, (err, stream) => {
     if (err) throw err;
@@ -174,9 +124,111 @@ function onReady(options) {
   });
 }
 
+// 是否开发环境
+function isDev({ env }) {
+  return env === "development";
+}
+
+// 检查必填项
+function checkRequiredFields(options) {
+  const { host, path, port } = options;
+  if (!port) {
+    options.port = 22;
+  }
+
+  if (!host) {
+    console.log(
+      chalk.red("🤔请配置服务器地址 \nplease configure the server address\n")
+    );
+  }
+  if (!path) {
+    console.log(
+      chalk.red("🤔请配置远程目录~ \nplease configure remote directory\n")
+    );
+  }
+  if (!host || !path) {
+    return;
+  }
+
+  return true;
+}
+
+// 检测是否为安全目录
+function isDangerDir({ path }) {
+  // 检测路径是否是系统目录
+  const warnPath = [
+    "*",
+    "/",
+    "/bin",
+    "/boot",
+    "/dev",
+    "/etc",
+    "/home",
+    "/lib",
+    "/opt",
+    "/proc",
+    "/root",
+    "/run",
+    "/sbin",
+    "/srv",
+    "/sys",
+    "/var",
+    "/*"
+  ];
+
+  return warnPath.includes(path);
+}
+
+// 检测登录信息
+async function checkLoginInfo(defaultConfig) {
+  const { password, username } = defaultConfig;
+  const question = [];
+
+  if (!username) {
+    question.push({
+      type: "input",
+      name: "username",
+      default: "root",
+      message: "请输入服务器用户名 \n please enter the server username",
+      validate: (val) => {
+        if (!val) {
+          return "请输入服务器用户名 \n please enter the server username";
+        }
+        return true;
+      }
+    });
+  }
+
+  if (!password) {
+    question.push({
+      type: "password",
+      name: "password",
+      message: "请输入服务器密码 \n please enter the server password",
+      validate: (val) => {
+        if (!val) {
+          return "请输入服务器密码 \n please enter the server password";
+        }
+        return true;
+      }
+    });
+  }
+
+  const answers = await inquirer.prompt(question);
+  if (answers.username) {
+    defaultConfig.username = answers.username;
+  }
+
+  if (answers.password) {
+    defaultConfig.password = answers.password;
+  }
+
+  return defaultConfig.username && defaultConfig.password;
+
+}
+
+// 连接失败处理
 function onError(e) {
-  console.log(chalk.red("\n连接失败\n"));
-  console.log(chalk.red("connection failed:"));
+  console.log(chalk.red("\n连接失败:\nconnection failed:"));
   if (e.message.includes("authentication")) {
     console.log(chalk.red("\n请检查用户名密码是否正确!"));
     console.log(
