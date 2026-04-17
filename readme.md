@@ -1,6 +1,6 @@
 # Vite Auto Deployer
 
-[English Documentation](readme.md) | [中文文档](README.zh-CN.md)
+[English Documentation](./readme.md) | [中文文档](./README.zh-CN.md)
 
 **Vite Automated Deployment Plugin** - An intelligent deployment solution designed for modern frontend development workflows
 

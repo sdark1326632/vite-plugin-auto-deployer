@@ -1,6 +1,6 @@
 # Vite Auto Deployer
 
-[English Documentation](readme.md) | [中文文档](README.zh-CN.md)
+[English Documentation](./readme.md) | [中文文档](./README.zh-CN.md)
 
 **Vite 自动化部署插件** - 专为现代前端开发工作流设计的智能部署解决方案
 
