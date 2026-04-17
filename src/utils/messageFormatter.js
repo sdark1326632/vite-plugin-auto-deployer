@@ -50,16 +50,16 @@ const MESSAGES = {
   
   // 部署相关
   STARTING_DEPLOYMENT_NAMED: {
-    zh: `\n🚀 开始部署到: {name} ({mode})`,
-    en: `\n🚀 Starting deployment to: {name} ({mode})`
+    zh: `🚀 开始部署到: {name} ({mode})`,
+    en: `🚀 Starting deployment to: {name} ({mode})`
   },
   STARTING_DEPLOYMENT_UNNAMED: {
-    zh: `\n🚀 开始部署到: {host}:{path} ({mode})`,
-    en: `\n🚀 Starting deployment to: {host}:{path} ({mode})`
+    zh: `🚀 开始部署到: {host}:{path} ({mode})`,
+    en: `🚀 Starting deployment to: {host}:{path} ({mode})`
   },
   DEPLOYMENT_ERROR: {
-    zh: `\n❌ 部署过程中发生错误: {error}`,
-    en: `\n❌ Deployment error occurred: {error}`
+    zh: `❌ 部署过程中发生错误: {error}`,
+    en: `❌ Deployment error occurred: {error}`
   },
   CHECK_CONFIG_AND_RETRY: {
     zh: "请手动检查配置并重新部署",
@@ -196,8 +196,8 @@ const MESSAGES = {
     en: "🚀 Starting parallel deployment to {count} servers..."
   },
   PARALLEL_DEPLOYMENT_COMPLETE: {
-    zh: "\n📊 并行部署完成: {success} 成功, {failed} 失败",
-    en: "\n📊 Parallel deployment complete: {success} successful, {failed} failed"
+    zh: "📊 并行部署完成: {success} 成功, {failed} 失败",
+    en: "📊 Parallel deployment complete: {success} successful, {failed} failed"
   },
   PARALLEL_DEPLOYMENT_PARTIAL_FAILURE: {
     zh: "并行部署中有 {failed} 个服务器部署失败",
@@ -225,7 +225,7 @@ function formatMessage(key, params = {}) {
       finalZhMessage = finalZhMessage.replace(placeholder, params[param]);
     }
     if (finalEnMessage.includes(placeholder)) {
-      finalEnMessage = finalEnMessage.replace(placeholder, params[param]);
+      finalEnMessage = finalEnMessage.replace(placeholder, params[param]) + '\n';
     }
   });
   

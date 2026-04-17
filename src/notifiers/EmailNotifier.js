@@ -130,8 +130,8 @@ class EmailNotifier extends BaseNotifier {
     // 发送邮件
     const info = await transporter.sendMail(mailOptions);
     
-    logMessage('gray', 'EMAIL_NOTIFICATION_CONFIG', { from, to: Array.isArray(to) ? to.join(', ') : to });
-    logMessage('gray', 'EMAIL_NOTIFICATION_SUBJECT', { subject: mailOptions.subject });
+    logMessage('success', 'EMAIL_NOTIFICATION_CONFIG', { from, to: Array.isArray(to) ? to.join(', ') : to });
+    logMessage('success', 'EMAIL_NOTIFICATION_SUBJECT', { subject: mailOptions.subject });
     
     return info;
   }

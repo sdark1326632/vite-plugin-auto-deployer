@@ -34,7 +34,7 @@ class DeploymentHandler {
       passphrase,
       beforeDeploy,
       afterDeploy,
-      enableLogging = true,
+      enableLogging = false,
       logDir = DEFAULT_LOG_DIR
     } = config;
     

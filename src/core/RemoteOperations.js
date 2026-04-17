@@ -158,7 +158,7 @@ class RemoteOperations {
           if (code === 0) {
             spinner?.succeed(formatMessage('HOOK_SUCCESS', { description }));
             if (output.trim()) {
-              logMessage('gray', 'HOOK_OUTPUT', { output: output.trim() });
+              logMessage("info", 'HOOK_OUTPUT', { output: output.trim() });
             }
             resolve();
           } else {

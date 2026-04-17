@@ -1,4 +1,5 @@
 const fs = require('fs').promises;
+const chalk = require('chalk');
 const { formatMessage, logMessage } = require('../utils/messageFormatter');
 const { isDangerousPath } = require('../utils/pathValidator');
 
@@ -20,7 +21,10 @@ function validateRequiredFields(options) {
   
   if (errors.length > 0) {
     logMessage('error', 'CONFIG_ERROR');
-    errors.forEach(error => console.log('\x1b[31m  - ' + error + '\x1b[0m'));
+    errors.forEach(error => {
+      // 使用灰色显示错误详情，保持一致性
+      console.log(chalk.gray('  - ' + error));
+    });
     return false;
   }
   
