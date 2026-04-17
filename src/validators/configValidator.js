@@ -1,0 +1,83 @@
+const fs = require('fs').promises;
+const { formatMessage, logMessage } = require('../utils/messageFormatter');
+const { isDangerousPath } = require('../utils/pathValidator');
+
+/**
+ * 验证必填字段
+ * @param {Object} options - 配置选项
+ * @returns {boolean} - 验证是否通过
+ */
+function validateRequiredFields(options) {
+  const errors = [];
+  
+  if (!options.host) {
+    errors.push(formatMessage('MISSING_HOST'));
+  }
+  
+  if (!options.path) {
+    errors.push(formatMessage('MISSING_PATH'));
+  }
+  
+  if (errors.length > 0) {
+    logMessage('error', 'CONFIG_ERROR');
+    errors.forEach(error => console.log('\x1b[31m  - ' + error + '\x1b[0m'));
+    return false;
+  }
+  
+  // 设置默认端口
+  if (options.port == null) {
+    options.port = 22;
+  }
+  
+  return true;
+}
+
+/**
+ * 验证 SSH 私钥文件
+ * @param {string} privateKeyPath - 私钥文件路径
+ * @returns {Promise<boolean>} - 验证是否通过
+ */
+async function validatePrivateKey(privateKeyPath) {
+  if (!privateKeyPath) return true;
+  
+  try {
+    await fs.access(privateKeyPath);
+    return true;
+  } catch (err) {
+    logMessage('error', 'PRIVATE_KEY_NOT_FOUND', { path: privateKeyPath });
+    return false;
+  }
+}
+
+/**
+ * 验证部署配置的完整性
+ * @param {Object} config - 部署配置
+ * @returns {Promise<boolean>} - 验证是否通过
+ */
+async function validateDeploymentConfig(config) {
+  // 验证私钥文件（如果提供了路径）
+  if (config.privateKeyPath && !await validatePrivateKey(config.privateKeyPath)) {
+    logMessage('error', 'PRIVATE_KEY_VALIDATION_FAILED');
+    return false;
+  }
+  
+  // 验证必填字段
+  if (!validateRequiredFields(config)) {
+    logMessage('error', 'CONFIG_VALIDATION_FAILED');
+    return false;
+  }
+  
+  // 验证路径安全性
+  if (isDangerousPath(config.path)) {
+    logMessage('error', 'DANGEROUS_PATH_DETECTED', { path: config.path });
+    return false;
+  }
+  
+  return true;
+}
+
+module.exports = {
+  validateRequiredFields,
+  validatePrivateKey,
+  validateDeploymentConfig
+};
