@@ -1,4 +1,3 @@
-const fs = require('fs').promises;
 const chalk = require('chalk');
 const { formatMessage, logMessage } = require('../utils/messageFormatter');
 const { isDangerousPath } = require('../utils/pathValidator');
@@ -37,34 +36,11 @@ function validateRequiredFields(options) {
 }
 
 /**
- * 验证 SSH 私钥文件
- * @param {string} privateKeyPath - 私钥文件路径
- * @returns {Promise<boolean>} - 验证是否通过
- */
-async function validatePrivateKey(privateKeyPath) {
-  if (!privateKeyPath) return true;
-  
-  try {
-    await fs.access(privateKeyPath);
-    return true;
-  } catch (err) {
-    logMessage('error', 'PRIVATE_KEY_NOT_FOUND', { path: privateKeyPath });
-    return false;
-  }
-}
-
-/**
  * 验证部署配置的完整性
  * @param {Object} config - 部署配置
  * @returns {Promise<boolean>} - 验证是否通过
  */
 async function validateDeploymentConfig(config) {
-  // 验证私钥文件（如果提供了路径）
-  if (config.privateKeyPath && !await validatePrivateKey(config.privateKeyPath)) {
-    logMessage('error', 'PRIVATE_KEY_VALIDATION_FAILED');
-    return false;
-  }
-  
   // 验证必填字段
   if (!validateRequiredFields(config)) {
     logMessage('error', 'CONFIG_VALIDATION_FAILED');
@@ -82,6 +58,5 @@ async function validateDeploymentConfig(config) {
 
 module.exports = {
   validateRequiredFields,
-  validatePrivateKey,
   validateDeploymentConfig
 };

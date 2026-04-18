@@ -45,10 +45,6 @@ interface VitePluginAutoDeployerOptions {
   username?: string;
   /** 服务器密码（可选，如未提供将在部署时交互式输入） */
   password?: string;
-  /** SSH私钥文件路径（可选，优先级高于密码） */
-  privateKeyPath?: string;
-  /** 私钥密码（如果私钥受密码保护） */
-  passphrase?: string;
   /** 远程服务器目标路径（必需） */
   path: string;
   /** 本地构建输出目录，默认使用Vite配置的outDir */
@@ -82,16 +78,6 @@ interface VitePluginAutoDeployerOptions {
  * })
  * 
  * @example
- * // SSH密钥认证
- * autoDeployer({
- *   mode: 'production',
- *   host: '192.168.1.100',
- *   path: '/var/www/html',
- *   privateKeyPath: '~/.ssh/id_rsa',
- *   passphrase: 'your-passphrase' // 如果私钥有密码
- * })
- * 
- * @example
  * // 包含部署钩子和通知
  * autoDeployer({
  *   mode: 'production',
@@ -120,13 +106,14 @@ interface VitePluginAutoDeployerOptions {
  *     mode: 'production', 
  *     host: '192.168.1.102',
  *     path: '/var/www/production',
- *     privateKeyPath: '~/.ssh/prod_key',
  *     enableLogging: true,
  *     notifications: [
  *       { type: 'webhook', url: 'https://notify.example.com/deploy' }
  *     ]
  *   }
  * ])
+ * 
+ * @note 注意：SSH密钥认证已从本插件中移除，仅支持基于密码的认证方式。
  */
 declare function vitePluginAutoDeployer(
   options: VitePluginAutoDeployerOptions | VitePluginAutoDeployerOptions[]

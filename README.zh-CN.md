@@ -26,7 +26,7 @@
 - **智能目录检测**: 自动识别 Vite 配置的输出目录 (`outDir`)，无需手动指定
 
 ### 安全可靠的传输
-- **多重认证**: 支持密码认证和 SSH 密钥认证
+- **密码认证**: 仅支持基于密码的认证方式（已移除SSH密钥认证以符合安全要求）
 - **SSH/SCP 协议**: 基于安全的 SSH 连接进行文件传输
 - **路径安全验证**: 严格验证远程路径，防止误删系统关键目录
 
@@ -111,16 +111,6 @@ npm run build --mode production
 
 ### 认证配置
 
-#### SSH 密钥认证（推荐）
-
-```js
-const config = {
-  // ... 其他配置
-  privateKeyPath: '~/.ssh/id_rsa',     // 私钥文件路径
-  passphrase: 'your-key-passphrase'    // 私钥密码（如果有的话）
-}
-```
-
 #### 密码认证
 
 ```js
@@ -130,6 +120,8 @@ const config = {
   // 或省略 password 字段，在部署时交互式输入
 }
 ```
+
+> **注意**: SSH密钥认证已从本插件中故意移除，以符合安全要求。仅支持基于密码的认证方式。
 
 ### 部署钩子
 
@@ -309,24 +301,21 @@ const multiEnvironmentConfig = [
     name: 'Staging Server',
     mode: 'staging',
     host: '192.168.1.200',
-    path: '/var/www/staging',
-    privateKeyPath: '~/.ssh/staging_key'
+    path: '/var/www/staging'
   },
   // 生产环境 - 当 --mode production 时会被选中  
   {
     name: 'Production Server',
     mode: 'production',
     host: '192.168.1.100',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/prod_key'
+    path: '/var/www/html'
   },
   // 额外的生产服务器（除非在数组中排在前面，否则不会被部署）
   {
     name: 'Backup Production Server',
     mode: 'production',
     host: '192.168.1.101',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/prod_key'
+    path: '/var/www/html'
   }
 ]
 
@@ -372,15 +361,13 @@ const serverList = [
     name: 'Web Server 1',
     mode: 'production',
     host: '192.168.1.101',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/web_servers'
+    path: '/var/www/html'
   },
   {
     name: 'Web Server 2',
     mode: 'production',
     host: '192.168.1.102',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/web_servers'
+    path: '/var/www/html'
   }
 ]
 
@@ -398,16 +385,14 @@ const multiEnvironmentConfig = [
     name: 'Staging Server',
     mode: 'staging',
     host: '192.168.1.200',
-    path: '/var/www/staging',
-    privateKeyPath: '~/.ssh/staging_key'
+    path: '/var/www/staging'
   },
   // 生产环境
   {
     name: 'Production Server',
     mode: 'production',
     host: '192.168.1.100',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/prod_key'
+    path: '/var/www/html'
   }
 ]
 ```
@@ -447,9 +432,8 @@ find "${remotePath}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 ### 认证安全最佳实践
 
 1. **避免密码硬编码**: 不在配置文件中存储明文密码
-2. **使用 SSH 密钥**: 生产环境推荐使用 SSH 密钥认证
-3. **私钥权限**: 确保私钥文件权限为 `600`
-4. **交互式输入**: 敏感信息在部署时安全输入
+2. **交互式输入**: 敏感信息在部署时安全输入
+3. **使用强密码**: 确保服务器密码符合安全要求
 
 ## 📝 日志与监控
 
@@ -540,11 +524,6 @@ find "${remotePath}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 - **避开系统目录**: 使用应用专用目录
 - **权限检查**: 确保目标目录可写
 
-#### 私钥文件未找到
-- **绝对路径**: 使用绝对路径指定私钥位置
-- **文件权限**: 确保私钥文件可读
-- **Windows 路径**: 使用正斜杠或双反斜杠
-
 ### 调试技巧
 
 ```bash
@@ -567,7 +546,6 @@ const secureConfig = {
   mode: 'production',
   host: 'your-server.com',
   username: 'deploy',
-  privateKeyPath: process.env.SSH_KEY_PATH, // 从环境变量获取
   path: '/opt/app/production',
   beforeDeploy: 'pm2 stop app || true',
   afterDeploy: 'npm install --production && pm2 start app.js',

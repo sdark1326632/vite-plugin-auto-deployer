@@ -72,9 +72,9 @@ module.exports = function (options) {
         // 收集缺失的登录信息（仅对第一个配置，假设所有服务器使用相同凭证）
         const completeConfig = await deploymentHandler.collectLoginInfo(validConfigs[0]);
         
-        // 应用相同的登录信息到所有配置（如果它们没有自己的凭证）
+        // 应用相同的登录信息到所有配置（如果它们没有自己的密码）
         const finalConfigs = validConfigs.map(config => {
-          if (!config.username && !config.password && !config.privateKeyPath) {
+          if (!config.username && !config.password) {
             return { ...config, username: completeConfig.username, password: completeConfig.password };
           }
           return config;

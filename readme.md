@@ -4,7 +4,6 @@
 
 **Vite Automated Deployment Plugin** - An intelligent deployment solution designed for modern frontend development workflows
 
-![Vite Auto Deployer](https://gitee.com/qq_1326632/vite-plugin-deployer/raw/master/images/4.png)
 
 ## 📌 Table of Contents
 
@@ -28,7 +27,7 @@
 
 ### Secure & Reliable Transfer
 - **SSH/SCP Protocol**: Secure file transfer based on SSH connections
-- **Multiple Authentication**: Supports both password and SSH key authentication
+- **Password Authentication**: Supports password-based authentication only (SSH key authentication has been removed for security compliance)
 - **Path Security Validation**: Strict validation of remote paths to prevent accidental deletion of critical system directories
 
 ### Flexible Deployment Control
@@ -112,16 +111,6 @@ npm run build -- --mode production
 
 ### Authentication Configuration
 
-#### SSH Key Authentication (Recommended)
-
-```js
-const config = {
-  // ... other configurations
-  privateKeyPath: '~/.ssh/id_rsa',     // Private key file path
-  passphrase: 'your-key-passphrase'    // Private key passphrase (if applicable)
-}
-```
-
 #### Password Authentication
 
 ```js
@@ -131,6 +120,8 @@ const config = {
   // Or omit the password field for interactive input during deployment
 }
 ```
+
+> **Note**: SSH key authentication has been intentionally removed from this plugin to comply with security requirements. Only password-based authentication is supported.
 
 ### Deployment Hooks
 
@@ -325,24 +316,21 @@ const multiEnvironmentConfig = [
     name: 'Staging Server',
     mode: 'staging',
     host: '192.168.1.200',
-    path: '/var/www/staging',
-    privateKeyPath: '~/.ssh/staging_key'
+    path: '/var/www/staging'
   },
   // Production environment - will be selected when --mode production  
   {
     name: 'Production Server',
     mode: 'production',
     host: '192.168.1.100',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/prod_key'
+    path: '/var/www/html'
   },
   // Additional production server (won't be deployed to unless it's the first match)
   {
     name: 'Backup Production Server',
     mode: 'production',
     host: '192.168.1.101',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/prod_key'
+    path: '/var/www/html'
   }
 ]
 
@@ -388,15 +376,13 @@ const serverList = [
     name: 'Web Server 1',
     mode: 'production',
     host: '192.168.1.101',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/web_servers'
+    path: '/var/www/html'
   },
   {
     name: 'Web Server 2',
     mode: 'production',
     host: '192.168.1.102',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/web_servers'
+    path: '/var/www/html'
   }
 ]
 
@@ -414,16 +400,14 @@ const multiEnvironmentConfig = [
     name: 'Staging Server',
     mode: 'staging',
     host: '192.168.1.200',
-    path: '/var/www/staging',
-    privateKeyPath: '~/.ssh/staging_key'
+    path: '/var/www/staging'
   },
   // Production environment
   {
     name: 'Production Server',
     mode: 'production',
     host: '192.168.1.100',
-    path: '/var/www/html',
-    privateKeyPath: '~/.ssh/prod_key'
+    path: '/var/www/html'
   }
 ]
 ```
@@ -463,9 +447,8 @@ find "${remotePath}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 ### Authentication Security Best Practices
 
 1. **Avoid Password Hardcoding**: Never store plaintext passwords in configuration files
-2. **Use SSH Keys**: Recommended for production environments
-3. **Private Key Permissions**: Ensure private key file permissions are set to `600`
-4. **Interactive Input**: Enter sensitive information securely during deployment
+2. **Interactive Input**: Enter sensitive information securely during deployment
+3. **Use Strong Passwords**: Ensure server passwords meet security requirements
 
 ## 📝 Logging & Monitoring
 
@@ -548,18 +531,13 @@ All prompt messages display both Chinese and English simultaneously, formatted a
 
 #### Connection Failed
 - **Check Network**: Ensure the build machine can access the target server
-- **Verify Credentials**: Confirm SSH credentials or private keys are correct
+- **Verify Credentials**: Confirm SSH credentials are correct
 - **Port Open**: Ensure SSH port (default 22) is open
 
 #### Path Validation Failed
 - **Use Absolute Paths**: Avoid relative paths
 - **Avoid System Directories**: Use application-specific directories
 - **Permission Check**: Ensure target directory is writable
-
-#### Private Key File Not Found
-- **Absolute Path**: Use absolute paths to specify private key location
-- **File Permissions**: Ensure private key file is readable
-- **Windows Paths**: Use forward slashes or double backslashes
 
 ### Debugging Tips
 
@@ -585,7 +563,6 @@ const secureConfig = {
   mode: 'production',
   host: 'your-server.com',
   username: 'deploy',
-  privateKeyPath: process.env.SSH_KEY_PATH, // Retrieved from environment variables
   path: '/opt/app/production',
   beforeDeploy: 'pm2 stop app || true',
   afterDeploy: 'npm install --production && pm2 start app.js',

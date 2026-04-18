@@ -30,8 +30,6 @@ class DeploymentHandler {
       path: remotePath, 
       outDir, 
       readyTimeout = 5000,
-      privateKeyPath,
-      passphrase,
       beforeDeploy,
       afterDeploy,
       enableLogging = false,
@@ -129,29 +127,14 @@ class DeploymentHandler {
         reject(error);
       });
       
-      // 构建 SSH 连接配置
+      // 构建 SSH 连接配置（仅使用密码认证）
       const connectConfig = {
         host,
         port,
         username,
+        password,
         readyTimeout
       };
-      
-      // 优先使用私钥认证
-      if (privateKeyPath) {
-        try {
-          connectConfig.privateKey = await fs.readFile(privateKeyPath);
-          if (passphrase) {
-            connectConfig.passphrase = passphrase;
-          }
-        } catch (readError) {
-          throw new Error(`Failed to read private key file: ${readError.message}`);
-        }
-      } else if (password) {
-        // 使用密码认证
-        connectConfig.password = password;
-      }
-      // 如果既没有私钥也没有密码，则依赖交互式输入（已在前面处理）
       
       conn.connect(connectConfig);
     });
@@ -175,8 +158,8 @@ class DeploymentHandler {
       });
     }
     
-    // 如果没有配置密码且没有私钥，则提示输入密码
-    if (!config.password && !config.privateKeyPath) {
+    // 如果没有配置密码，则提示输入密码
+    if (!config.password) {
       questions.push({
         type: 'password',
         name: 'password',
