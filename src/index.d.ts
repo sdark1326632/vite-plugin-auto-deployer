@@ -33,8 +33,8 @@ interface EmailNotification {
 }
 
 interface VitePluginAutoDeployerOptions {
-  /** 环境模式，用于匹配当前构建环境 */
-  mode?: string;
+  /** 环境模式，用于匹配当前构建环境（必需） */
+  mode: string;
   /** 服务器名称（可选，用于显示） */
   name?: string;
   /** 服务器主机地址（必需） */
@@ -114,6 +114,7 @@ interface VitePluginAutoDeployerOptions {
  * ])
  * 
  * @note 注意：SSH密钥认证已从本插件中移除，仅支持基于密码的认证方式。
+ * @note 注意：mode 参数现在是必需的，必须明确指定部署环境。
  */
 declare function vitePluginAutoDeployer(
   options: VitePluginAutoDeployerOptions | VitePluginAutoDeployerOptions[]

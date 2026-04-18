@@ -15,6 +15,10 @@ const MESSAGES = {
     zh: "远程目录路径 (path) 是必需的", 
     en: "Remote directory path is required"
   },
+  MISSING_MODE: {
+    zh: "环境模式 (mode) 是必需的",
+    en: "Environment mode is required"
+  },
   
   // 环境相关
   SKIP_DEV_ENV: {

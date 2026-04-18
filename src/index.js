@@ -36,10 +36,10 @@ module.exports = function (options) {
           return;
         }
       } else {
-        // 单服务器配置
+        // 单服务器配置 - mode 现在是必填项，直接使用
         const deployConfig = options;
-        // 如果配置了 mode，检查是否匹配
-        if (deployConfig.mode && deployConfig.mode !== currentMode) {
+        // 检查 mode 是否匹配当前构建环境
+        if (deployConfig.mode !== currentMode) {
           logMessage('warning', 'MODE_MISMATCH', { configMode: deployConfig.mode, currentMode });
           return;
         }

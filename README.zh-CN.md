@@ -22,11 +22,10 @@
 
 ### 智能自动化部署
 - **无缝集成**: 作为标准 Vite 插件，自动在构建完成后触发部署流程
-- **环境感知**: 根据 `--mode` 参数自动匹配对应的服务器配置
 - **智能目录检测**: 自动识别 Vite 配置的输出目录 (`outDir`)，无需手动指定
 
 ### 安全可靠的传输
-- **密码认证**: 仅支持基于密码的认证方式（已移除SSH密钥认证以符合安全要求）
+- **密码认证**: 基于密码的认证方式
 - **SSH/SCP 协议**: 基于安全的 SSH 连接进行文件传输
 - **路径安全验证**: 严格验证远程路径，防止误删系统关键目录
 
@@ -65,7 +64,7 @@ import autoDeployer from 'vite-plugin-auto-deployer'
 
 const deploymentConfig = {
   name: '生产环境',
-  mode: 'production',           // 匹配构建命令中的 --mode 参数
+  mode: 'production',           // 匹配构建命令中的 --mode 参数（必需）
   host: '192.168.1.100',       // 服务器地址
   port: 22,                    // SSH 端口
   username: 'deploy',          // 服务器用户名
@@ -101,7 +100,7 @@ npm run build --mode production
 | 参数 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
 | `name` | `string` | 否 | - | 服务器名称，用于日志和显示 |
-| `mode` | `string` | 否 | 当前构建模式 | 匹配 Vite 的构建模式 |
+| `mode` | `string` | **是** | - | 匹配 Vite 的构建模式（必需） |
 | `host` | `string` | **是** | - | 服务器 IP 地址或域名 |
 | `port` | `number` | 否 | `22` | SSH 端口 |
 | `username` | `string` | 否 | - | 服务器用户名（未提供则交互式输入） |
@@ -237,7 +236,7 @@ const config = {
 }
 ```
 
-**4. 环境变量安全配置（推荐）**
+**3. 环境变量安全配置（推荐）**
 
 为避免在代码中硬编码敏感信息，建议使用环境变量：
 
@@ -292,6 +291,8 @@ DEPLOY_NOTIFY_EMAIL=dev-team@example.com,manager@example.com
 
 插件现在支持**从配置列表中选择单个服务器进行部署**。当您提供服务器配置数组时，插件会自动根据当前构建环境（`--mode`）找到并部署到**第一个匹配的服务器**，而不是同时部署到所有匹配的服务器。
 
+> **重要**: `mode` 参数现在是**必需的**。您必须为每个服务器配置明确指定部署环境。
+
 这种方案提供了更好的控制性，防止意外的多服务器部署。
 
 ```js
@@ -299,21 +300,21 @@ const multiEnvironmentConfig = [
   // 测试环境 - 当 --mode staging 时会被选中
   {
     name: 'Staging Server',
-    mode: 'staging',
+    mode: 'staging',             // 必需 - 指定目标环境
     host: '192.168.1.200',
     path: '/var/www/staging'
   },
   // 生产环境 - 当 --mode production 时会被选中  
   {
     name: 'Production Server',
-    mode: 'production',
+    mode: 'production',          // 必需 - 指定目标环境
     host: '192.168.1.100',
     path: '/var/www/html'
   },
   // 额外的生产服务器（除非在数组中排在前面，否则不会被部署）
   {
     name: 'Backup Production Server',
-    mode: 'production',
+    mode: 'production',          // 必需 - 指定目标环境
     host: '192.168.1.101',
     path: '/var/www/html'
   }
@@ -399,7 +400,7 @@ const multiEnvironmentConfig = [
 
 ### 环境自动匹配优势
 
-- **智能选择**: 插件会根据当前构建环境（`--mode` 参数或 `NODE_ENV`）自动选择匹配的配置
+- **智能选择**: 插件会根据当前构建环境（`--mode` 参数）自动选择匹配的配置
 - **简化配置**: 无需为不同环境维护多个配置文件，所有配置集中管理
 - **安全隔离**: 不同环境的服务器配置完全隔离，避免误操作
 
@@ -452,7 +453,7 @@ find "${remotePath}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 **日志格式**: JSON 格式，包含完整的部署上下文信息
 
 **日志示例**:
-```
+```json
 {
   "timestamp": "2026-04-16T18:24:09.123Z",
   "level": "DEPLOYMENT_START",

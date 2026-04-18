@@ -10,6 +10,10 @@ const { isDangerousPath } = require('../utils/pathValidator');
 function validateRequiredFields(options) {
   const errors = [];
   
+  if (!options.mode) {
+    errors.push(formatMessage('MISSING_MODE'));
+  }
+  
   if (!options.host) {
     errors.push(formatMessage('MISSING_HOST'));
   }

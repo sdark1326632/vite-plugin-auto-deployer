@@ -22,12 +22,11 @@
 
 ### Intelligent Automated Deployment
 - **Seamless Integration**: Standard Vite plugin that automatically triggers deployment after build completion
-- **Environment Awareness**: Automatically matches server configuration based on the `--mode` parameter
 - **Smart Directory Detection**: Automatically identifies Vite's output directory (`outDir`), no manual specification required
 
 ### Secure & Reliable Transfer
 - **SSH/SCP Protocol**: Secure file transfer based on SSH connections
-- **Password Authentication**: Supports password-based authentication only (SSH key authentication has been removed for security compliance)
+- **Password Authentication**: Supports password-based authentication  
 - **Path Security Validation**: Strict validation of remote paths to prevent accidental deletion of critical system directories
 
 ### Flexible Deployment Control
@@ -65,7 +64,7 @@ import autoDeployer from 'vite-plugin-auto-deployer'
 
 const deploymentConfig = {
   name: 'Production Environment',
-  mode: 'production',           // Matches the --mode parameter in build commands
+  mode: 'production',           // Matches the --mode parameter in build commands (required)
   host: '192.168.1.100',       // Server IP address or domain
   port: 22,                    // SSH port
   username: 'deploy',          // Server username
@@ -101,7 +100,7 @@ npm run build -- --mode production
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `name` | `string` | No | - | Server name for logging and display |
-| `mode` | `string` | No | Current build mode | Matches Vite's build mode |
+| `mode` | `string` | **Yes** | - | Matches Vite's build mode (required) |
 | `host` | `string` | **Yes** | - | Server IP address or domain |
 | `port` | `number` | No | `22` | SSH port |
 | `username` | `string` | No | - | Server username (interactive input if not provided) |
@@ -237,22 +236,8 @@ const config = {
 }
 ```
 
-**3. Install Dependencies**
 
-Email functionality requires the `nodemailer` package:
-
-```bash
-# npm
-npm install nodemailer
-
-# yarn  
-yarn add nodemailer
-
-# pnpm
-pnpm add nodemailer
-```
-
-**4. Secure Configuration with Environment Variables (Recommended)**
+**3. Secure Configuration with Environment Variables (Recommended)**
 
 To avoid hardcoding sensitive information in code, use environment variables:
 
@@ -307,28 +292,30 @@ DEPLOY_NOTIFY_EMAIL=dev-team@example.com,manager@example.com
 
 The plugin now supports **single server deployment from a configuration list**. When you provide an array of server configurations, the plugin will automatically find and deploy to the **first matching server** based on the current build environment (`--mode`), rather than deploying to all matching servers simultaneously.
 
-This approach provides better control and prevents unintended multi-server deployments.
+> **Important**: The `mode` parameter is now **required** for all deployment configurations. You must explicitly specify the deployment environment for each server configuration.
 
-```js
+This approach provides better control and prevents accidental multi-server deployments.
+
+```javascript
 const multiEnvironmentConfig = [
   // Staging environment - will be selected when --mode staging
   {
     name: 'Staging Server',
-    mode: 'staging',
+    mode: 'staging',             // Required - specifies the target environment
     host: '192.168.1.200',
     path: '/var/www/staging'
   },
   // Production environment - will be selected when --mode production  
   {
     name: 'Production Server',
-    mode: 'production',
+    mode: 'production',          // Required - specifies the target environment
     host: '192.168.1.100',
     path: '/var/www/html'
   },
-  // Additional production server (won't be deployed to unless it's the first match)
+  // Additional production server (will not be deployed unless positioned earlier in the array)
   {
     name: 'Backup Production Server',
-    mode: 'production',
+    mode: 'production',          // Required - specifies the target environment
     host: '192.168.1.101',
     path: '/var/www/html'
   }
