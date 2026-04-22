@@ -9,7 +9,7 @@ class NotificationManager {
   constructor() {
     this.notifiers = {
       webhook: new WebhookNotifier(),
-      email: new EmailNotifier()
+      email: new EmailNotifier(),
     };
   }
 
@@ -22,7 +22,7 @@ class NotificationManager {
    */
   async sendNotifications(notifications = [], success, error = null) {
     if (notifications.length === 0) return;
-    
+
     const notificationData = {
       deployment: {
         name: this.config?.name,
@@ -31,10 +31,10 @@ class NotificationManager {
         path: this.config?.path,
         timestamp: new Date().toISOString(),
         success,
-        error: error ? error.message : null
-      }
+        error: error ? error.message : null,
+      },
     };
-    
+
     for (const notification of notifications) {
       try {
         const notifier = this.notifiers[notification.type];
@@ -44,8 +44,11 @@ class NotificationManager {
         }
         await notifier.send(notification, notificationData);
       } catch (notifyError) {
-        this.notifiers[notification.type]?.logSendFailure?.(notification.type, notifyError) || 
-          logMessage('warning', 'NOTIFICATION_SEND_FAILED', { type: notification.type, error: notifyError.message });
+        this.notifiers[notification.type]?.logSendFailure?.(notification.type, notifyError) ||
+          logMessage('warning', 'NOTIFICATION_SEND_FAILED', {
+            type: notification.type,
+            error: notifyError.message,
+          });
       }
     }
   }

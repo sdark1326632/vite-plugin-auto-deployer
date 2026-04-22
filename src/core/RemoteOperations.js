@@ -20,7 +20,7 @@ class RemoteOperations {
           reject(new Error(formatMessage('REMOTE_DIR_CREATE_ERROR')));
           return;
         }
-        
+
         stream.on('close', (code) => {
           if (code === 0) {
             spinner?.succeed(formatMessage('REMOTE_DIR_READY', { path: remotePath }));
@@ -29,7 +29,7 @@ class RemoteOperations {
             reject(new Error(formatMessage('REMOTE_DIR_CREATE_ERROR')));
           }
         });
-        
+
         stream.stderr.on('data', (data) => {
           logMessage('warning', 'DIR_CREATE_WARNING', { warning: data.toString().trim() });
         });
@@ -48,13 +48,13 @@ class RemoteOperations {
     return new Promise((resolve, reject) => {
       // 使用更安全的方法：列出目录内容并逐个删除
       const cleanCommand = `if [ -d "${remotePath}" ] && [ "$(ls -A "${remotePath}")" ]; then find "${remotePath}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +; fi`;
-      
+
       conn.exec(cleanCommand, (err, stream) => {
         if (err) {
           reject(new Error(formatMessage('CLEAN_REMOTE_DIR_COMPLETED', { path: remotePath })));
           return;
         }
-        
+
         let hasError = false;
         stream.on('close', (code) => {
           if (code === 0 && !hasError) {
@@ -65,7 +65,7 @@ class RemoteOperations {
             resolve(); // 继续上传，即使有警告
           }
         });
-        
+
         stream.stderr.on('data', (data) => {
           const errorData = data.toString().trim();
           if (errorData) {
@@ -89,9 +89,9 @@ class RemoteOperations {
     return new Promise((resolve, reject) => {
       const uploadOptions = {
         ...sshConfig,
-        path: remotePath
+        path: remotePath,
       };
-      
+
       scpClient.scp(localDir, uploadOptions, (err) => {
         if (err) {
           reject(new Error(formatMessage('UPLOAD_FAILED', { error: err.message })));
@@ -134,31 +134,31 @@ class RemoteOperations {
         resolve();
         return;
       }
-      
+
       spinner?.start(formatMessage('EXECUTING_HOOK', { description }));
-      
+
       conn.exec(command, (err, stream) => {
         if (err) {
           reject(new Error(formatMessage('HOOK_FAILED', { description, code: err.message })));
           return;
         }
-        
+
         let output = '';
         let stderrOutput = '';
-        
+
         stream.on('data', (data) => {
           output += data.toString();
         });
-        
+
         stream.stderr.on('data', (data) => {
           stderrOutput += data.toString();
         });
-        
+
         stream.on('close', (code) => {
           if (code === 0) {
             spinner?.succeed(formatMessage('HOOK_SUCCESS', { description }));
             if (output.trim()) {
-              logMessage("info", 'HOOK_OUTPUT', { output: output.trim() });
+              logMessage('info', 'HOOK_OUTPUT', { output: output.trim() });
             }
             resolve();
           } else {

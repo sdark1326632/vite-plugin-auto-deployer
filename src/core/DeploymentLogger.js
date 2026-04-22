@@ -16,18 +16,19 @@ class DeploymentLogger {
     this.currentLogFile = null;
     this.currentDeploymentId = null;
   }
-  
+
   async initLog(deploymentConfig) {
     if (!this.enableLogging) return;
-    
+
     try {
       await fs.mkdir(this.logDir, { recursive: true });
-      
+
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const serverName = deploymentConfig.name || `${deploymentConfig.host}_${deploymentConfig.mode}`;
+      const serverName =
+        deploymentConfig.name || `${deploymentConfig.host}_${deploymentConfig.mode}`;
       this.currentLogFile = path.join(this.logDir, `deploy_${serverName}_${timestamp}.log`);
       this.currentDeploymentId = `deploy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // 写入部署开始日志
       await this.writeLog('DEPLOYMENT_START', {
         deploymentId: this.currentDeploymentId,
@@ -38,33 +39,33 @@ class DeploymentLogger {
           host: deploymentConfig.host,
           port: deploymentConfig.port,
           path: deploymentConfig.path,
-          outDir: deploymentConfig.outDir
+          outDir: deploymentConfig.outDir,
         },
         environment: {
           nodeVersion: process.version,
           platform: os.platform(),
-          cwd: process.cwd()
-        }
+          cwd: process.cwd(),
+        },
       });
-      
+
       logMessage('gray', 'LOGGING_ENABLED', { logFile: this.currentLogFile });
     } catch (error) {
       logMessage('warning', 'LOG_INIT_FAILED', { error: error.message });
       this.enableLogging = false;
     }
   }
-  
+
   async writeLog(level, data) {
     if (!this.enableLogging || !this.currentLogFile) return;
-    
+
     try {
       const logEntry = {
         timestamp: new Date().toISOString(),
         level,
         deploymentId: this.currentDeploymentId,
-        ...data
+        ...data,
       };
-      
+
       const logLine = JSON.stringify(logEntry) + '\n';
       await fs.appendFile(this.currentLogFile, logLine);
     } catch (error) {
@@ -72,18 +73,18 @@ class DeploymentLogger {
       logMessage('warning', 'LOG_WRITE_FAILED', { error: error.message });
     }
   }
-  
+
   async finalizeLog(success, error = null) {
     if (!this.enableLogging || !this.currentLogFile) return;
-    
+
     try {
       await this.writeLog('DEPLOYMENT_END', {
         success,
         endTime: new Date().toISOString(),
         duration: Date.now() - parseInt(this.currentDeploymentId.split('-')[1]),
-        error: error ? error.message : null
+        error: error ? error.message : null,
       });
-      
+
       if (success) {
         logMessage('gray', 'LOG_SAVED_SUCCESS', { logFile: this.currentLogFile });
       } else {
@@ -97,5 +98,5 @@ class DeploymentLogger {
 
 module.exports = {
   DeploymentLogger,
-  DEFAULT_LOG_DIR
+  DEFAULT_LOG_DIR,
 };

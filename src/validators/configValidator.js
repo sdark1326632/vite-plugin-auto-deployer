@@ -9,33 +9,33 @@ const { isDangerousPath } = require('../utils/pathValidator');
  */
 function validateRequiredFields(options) {
   const errors = [];
-  
+
   if (!options.mode) {
     errors.push(formatMessage('MISSING_MODE'));
   }
-  
+
   if (!options.host) {
     errors.push(formatMessage('MISSING_HOST'));
   }
-  
+
   if (!options.path) {
     errors.push(formatMessage('MISSING_PATH'));
   }
-  
+
   if (errors.length > 0) {
     logMessage('error', 'CONFIG_ERROR');
-    errors.forEach(error => {
+    errors.forEach((error) => {
       // 使用灰色显示错误详情，保持一致性
       console.log(chalk.gray('  - ' + error));
     });
     return false;
   }
-  
+
   // 设置默认端口
   if (options.port == null) {
     options.port = 22;
   }
-  
+
   return true;
 }
 
@@ -50,17 +50,17 @@ async function validateDeploymentConfig(config) {
     logMessage('error', 'CONFIG_VALIDATION_FAILED');
     return false;
   }
-  
+
   // 验证路径安全性
   if (isDangerousPath(config.path)) {
     logMessage('error', 'DANGEROUS_PATH_DETECTED', { path: config.path });
     return false;
   }
-  
+
   return true;
 }
 
 module.exports = {
   validateRequiredFields,
-  validateDeploymentConfig
+  validateDeploymentConfig,
 };

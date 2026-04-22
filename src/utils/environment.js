@@ -9,5 +9,5 @@ function getEnvironmentMode(resolvedConfig) {
 }
 
 module.exports = {
-  getEnvironmentMode
+  getEnvironmentMode,
 };

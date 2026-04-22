@@ -12,7 +12,7 @@ let nodemailer;
  */
 function generateEmailTemplate(templateType, data) {
   const { deployment } = data;
-  
+
   switch (templateType) {
     case 'simple':
       return `
@@ -25,7 +25,7 @@ function generateEmailTemplate(templateType, data) {
           ${deployment.error ? `<p><strong>Error:</strong> ${deployment.error}</p>` : ''}
         </div>
       `;
-    
+
     default: // 'default' template
       return `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
@@ -71,12 +71,16 @@ function generateEmailTemplate(templateType, data) {
             </table>
           </div>
           
-          ${deployment.error ? `
+          ${
+            deployment.error
+              ? `
             <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
               <h4 style="margin: 0 0 10px 0; color: #856404;">Error Details</h4>
               <p style="margin: 0; font-family: monospace; font-size: 13px; color: #856404; white-space: pre-wrap;">${deployment.error}</p>
             </div>
-          ` : ''}
+          `
+              : ''
+          }
           
           <div style="text-align: center; font-size: 12px; color: #999; border-top: 1px solid #eee; padding-top: 15px;">
             <p style="margin: 0;">This is an automated message from Vite Auto Deployer.</p>
@@ -98,41 +102,46 @@ class EmailNotifier extends BaseNotifier {
    */
   async send(notification, data) {
     const { smtp, from, to, subject, template = 'default' } = notification;
-    
+
     // 懒加载nodemailer
     if (!nodemailer) {
       try {
         nodemailer = require('nodemailer');
       } catch (error) {
         logMessage('error', 'EMAIL_NOTIFICATION_PLACEHOLDER');
-        throw new Error('nodemailer package is required for email notifications. Please install it: npm install nodemailer');
+        throw new Error(
+          'nodemailer package is required for email notifications. Please install it: npm install nodemailer'
+        );
       }
     }
-    
+
     // 创建邮件传输器
     const transporter = nodemailer.createTransport(smtp);
-    
+
     // 验证SMTP连接
     try {
       await transporter.verify();
     } catch (error) {
       throw new Error(`SMTP connection verification failed: ${error.message}`);
     }
-    
+
     // 构建邮件内容
     const mailOptions = {
       from: from,
       to: Array.isArray(to) ? to.join(', ') : to,
       subject: subject || 'Vite Auto Deployment Notification',
-      html: generateEmailTemplate(template, data)
+      html: generateEmailTemplate(template, data),
     };
-    
+
     // 发送邮件
     const info = await transporter.sendMail(mailOptions);
-    
-    logMessage('success', 'EMAIL_NOTIFICATION_CONFIG', { from, to: Array.isArray(to) ? to.join(', ') : to });
+
+    logMessage('success', 'EMAIL_NOTIFICATION_CONFIG', {
+      from,
+      to: Array.isArray(to) ? to.join(', ') : to,
+    });
     logMessage('success', 'EMAIL_NOTIFICATION_SUBJECT', { subject: mailOptions.subject });
-    
+
     return info;
   }
 }

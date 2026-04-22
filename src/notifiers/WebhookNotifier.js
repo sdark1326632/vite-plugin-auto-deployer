@@ -1,7 +1,7 @@
 const BaseNotifier = require('./BaseNotifier');
 
 /**
- * Webhook通知器
+ * Webhook通知�?
  */
 class WebhookNotifier extends BaseNotifier {
   /**
@@ -12,15 +12,15 @@ class WebhookNotifier extends BaseNotifier {
    */
   async send(notification, data) {
     const { url, headers = {}, method = 'POST' } = notification;
-    
+
     const https = require('https');
     const http = require('http');
-    const urlModule = require('url');
-    
-    const parsedUrl = urlModule.parse(url);
+    const { URL } = require('url');
+
+    const parsedUrl = new URL(url);
     const isHttps = parsedUrl.protocol === 'https:';
     const client = isHttps ? https : http;
-    
+
     const postData = JSON.stringify(data);
     const options = {
       hostname: parsedUrl.hostname,
@@ -30,10 +30,10 @@ class WebhookNotifier extends BaseNotifier {
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(postData),
-        ...headers
-      }
+        ...headers,
+      },
     };
-    
+
     return new Promise((resolve, reject) => {
       const req = client.request(options, (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -42,7 +42,7 @@ class WebhookNotifier extends BaseNotifier {
           reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
         }
       });
-      
+
       req.on('error', reject);
       req.write(postData);
       req.end();
