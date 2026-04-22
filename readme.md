@@ -20,24 +20,26 @@
 
 ## ✨ Core Features
 
-### Intelligent Automated Deployment
+### Automated Deployment
 - **Seamless Integration**: Standard Vite plugin that automatically triggers deployment after build completion
-- **Smart Directory Detection**: Automatically identifies Vite's output directory (`outDir`), no manual specification required
+- **Automatic Directory Detection**: Automatically identifies Vite configuration output directory (`outDir`), no manual specification required
 
 ### Secure & Reliable Transfer
-- **SSH/SCP Protocol**: Secure file transfer based on SSH connections
-- **Password Authentication**: Supports password-based authentication  
-- **Path Security Validation**: Strict validation of remote paths to prevent accidental deletion of critical system directories
+- **Password Encryption**: Avoid direct contact with passwords
+- **SSH/SCP Protocol**: Use secure SSH protocol for file transmission
+- **Path Security Validation**: Built-in validation of remote paths to prevent deletion of important directories
 
 ### Flexible Deployment Control
-- **Interactive Credential Input**: Sensitive information is not hardcoded in config files, entered securely during deployment
-- **Deployment Hooks**: Supports custom command execution before and after deployment (string or function format)
-- **Multi-environment Configuration**: Supports configuring multiple environments (such as staging, production), and the plugin automatically selects the matching configuration based on the current build environment for deployment
+- **Interactive Confirmation Prompts**: Sensitive operations are not hardcoded in configuration files, secure confirmation before deployment
+- **Deployment Hooks**: Support execution of custom commands before and after deployment (string or function format)
+- **Multi-environment Configuration**: Support configuration of multiple environments (such as staging, production), plugin automatically selects matching configuration based on current build environment for deployment
 
 ### Professional User Experience
-- **Bilingual Messages**: Displays both Chinese and English prompts simultaneously for global developer comprehension
-- **Detailed Logging**: Complete deployment audit logs for issue tracking and analysis
-- **Notification Integration**: Supports Webhook and email notifications for real-time deployment status monitoring
+- **Bilingual Prompts**: Display both Chinese and English prompts simultaneously to ensure global developers can understand
+- **Detailed Logging**: Complete deployment logs for easy troubleshooting and analysis
+- **Notification Integration**: Support Webhook and email notifications for real-time deployment status
+- **Performance Optimization**: Support concurrent file uploads and file compression to improve deployment efficiency
+- **Code Quality**: Integrated ESLint, Prettier and Jest to ensure code standards and test coverage
 
 ## 🚀 Quick Start
 
@@ -56,132 +58,135 @@ pnpm add -D vite-plugin-auto-deployer
 
 ### Basic Configuration
 
-```js
-// vite.config.js
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import autoDeployer from 'vite-plugin-auto-deployer'
+Add the plugin to `vite.config.js`:
 
-const deploymentConfig = {
-  name: 'Production Environment',
-  mode: 'production',           // Matches the --mode parameter in build commands (required)
-  host: '192.168.1.100',       // Server IP address or domain
-  port: 22,                    // SSH port
-  username: 'deploy',          // Server username
-  // password: 'your-password', // Password (optional, interactive input recommended)
-  path: '/var/www/html'        // Remote deployment directory
-}
+```javascript
+import { defineConfig } from 'vite'
+import { vitePluginAutoDeployer } from 'vite-plugin-auto-deployer'
 
 export default defineConfig({
   plugins: [
-    vue(),
-    autoDeployer(deploymentConfig)
+    vitePluginAutoDeployer({
+      host: 'your-server.com',
+      username: 'deploy',
+      password: 'your-password',
+      remotePath: '/var/www/html'
+    })
   ]
 })
 ```
 
-### Build & Deploy
+### Run Build
 
 ```bash
-# Development build (no deployment triggered)
-npm run build -- --mode development
-
-# Staging environment deployment
-npm run build -- --mode staging
-
-# Production environment deployment
-npm run build -- --mode production
+npm run build
 ```
+
+The plugin will automatically trigger the deployment process after build completion.
 
 ## 🔧 Configuration Options
 
 ### Basic Configuration
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `name` | `string` | No | - | Server name for logging and display |
-| `mode` | `string` | **Yes** | - | Matches Vite's build mode (required) |
-| `host` | `string` | **Yes** | - | Server IP address or domain |
-| `port` | `number` | No | `22` | SSH port |
-| `username` | `string` | No | - | Server username (interactive input if not provided) |
-| `password` | `string` | No | - | Server password (interactive input if not provided) |
-| `path` | `string` | **Yes** | - | Remote server deployment directory |
-| `outDir` | `string` | No | Vite's configured `outDir` | Local build output directory |
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `host` | `string` | ✅ | - | Remote server address |
+| `username` | `string` | ✅ | - | SSH username |
+| `password` | `string` | ✅ | - | SSH password |
+| `remotePath` | `string` | ✅ | - | Remote deployment path |
 
-### Authentication Configuration
+### Advanced Configuration
 
-#### Password Authentication
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `port` | `number` | ❌ | `22` | SSH port |
+| `localPath` | `string` | ❌ | `dist` | Local build output directory |
+| `concurrency` | `number` | ❌ | `3` | Concurrent upload count |
+| `compress` | `boolean` | ❌ | `true` | Enable file compression |
+| `preDeploy` | `string \| Function` | ❌ | - | Command to execute before deployment |
+| `postDeploy` | `string \| Function` | ❌ | - | Command to execute after deployment |
+| `exclude` | `string[]` | ❌ | `[]` | File patterns to exclude |
+| `include` | `string[]` | ❌ | `['**/*']` | File patterns to include |
 
-```js
-const config = {
-  // ... other configurations
-  password: 'your-password'            // Plaintext password (not recommended)
-  // Or omit the password field for interactive input during deployment
-}
+### Multi-environment Configuration
+
+```javascript
+export default defineConfig({
+  plugins: [
+    vitePluginAutoDeployer({
+      staging: {
+        host: 'staging.example.com',
+        username: 'deploy',
+        password: 'staging-password',
+        remotePath: '/var/www/staging'
+      },
+      production: {
+        host: 'production.example.com',
+        username: 'deploy',
+        password: 'prod-password',
+        remotePath: '/var/www/production'
+      }
+    })
+  ]
+})
 ```
 
-> **Note**: SSH key authentication has been intentionally removed from this plugin to comply with security requirements. Only password-based authentication is supported.
+## 🎯 Advanced Features
 
 ### Deployment Hooks
 
-#### String Format
-
-```js
-const config = {
-  // ... other configurations
-  beforeDeploy: 'echo "Stopping services..." && pm2 stop app || true',
-  afterDeploy: 'npm install --production && pm2 start app.js'
-}
+```javascript
+vitePluginAutoDeployer({
+  host: 'your-server.com',
+  username: 'deploy',
+  password: 'your-password',
+  remotePath: '/var/www/html',
+  preDeploy: 'pm2 stop my-app',
+  postDeploy: 'pm2 start my-app'
+})
 ```
 
-#### Function Format (Dynamic Configuration)
+### Custom Hook Functions
 
-```js
-const config = {
-  // ... other configurations
-  beforeDeploy: (deploymentConfig) => {
-    if (deploymentConfig.mode === 'production') {
-      return 'pm2 stop app && echo "Production services stopped"';
-    }
-    return 'echo "Staging deployment starting"';
+```javascript
+vitePluginAutoDeployer({
+  host: 'your-server.com',
+  username: 'deploy',
+  password: 'your-password',
+  remotePath: '/var/www/html',
+  preDeploy: async () => {
+    console.log('Preparing deployment...')
+    // Execute custom logic
   },
-  afterDeploy: (deploymentConfig) => {
-    const commands = [
-      'npm install --production',
-      `echo "Deployment completed for ${deploymentConfig.name}"`,
-      'pm2 start app.js || pm2 restart app'
-    ];
-    return commands.join(' && ');
+  postDeploy: async () => {
+    console.log('Deployment completed!')
+    // Execute custom logic
   }
-}
+})
 ```
 
-### Logging Configuration
+### File Filtering
 
-```js
-const config = {
-  // ... other configurations
-  enableLogging: true,                 // Enable logging (default: false)
-  logDir: './deployment-logs'          // Custom log directory (default: ./.vite-auto-deployer/logs)
-}
+```javascript
+vitePluginAutoDeployer({
+  host: 'your-server.com',
+  username: 'deploy',
+  password: 'your-password',
+  remotePath: '/var/www/html',
+  include: ['**/*', '!node_modules/**'],
+  exclude: ['*.log', 'temp/**']
+})
 ```
 
-### Notification Configuration
+### Notification Integration
 
-```js
-const config = {
+#### Email Notifications
+
+```javascript
+vitePluginAutoDeployer({
   // ... other configurations
-  notifications: [
-    // Webhook notification
-    {
-      type: 'webhook',
-      url: 'https://hooks.slack.com/services/YOUR/WEBHOOK',
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST'
-    },
-    // Email notification (requires SMTP configuration)
-    {
-      type: 'email',
+  notifications: {
+    email: {
       smtp: {
         host: 'smtp.gmail.com',
         port: 587,
@@ -191,396 +196,239 @@ const config = {
           pass: 'your-app-password'
         }
       },
-      from: 'deploy@yourcompany.com',
-      to: ['devops@yourcompany.com'],
-      subject: 'Vite Auto Deployment Status'
+      to: 'team@example.com',
+      from: 'deploy@example.com'
     }
-  ]
-}
+  }
+})
 ```
 
-#### QQ Email Configuration Example
-
-To use QQ Email for notifications, configure as follows:
-
-**1. Obtain QQ Email Authorization Code**
-- Log in to QQ Email web version
-- Go to「Settings」→「Account」
-- Find「POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV Service」
-- Enable「IMAP/SMTP Service」
-- Follow instructions to send SMS and obtain authorization code (16-character alphanumeric)
-
-**2. QQ Email SMTP Configuration**
-
-```js
-const config = {
-  // ... other configurations
-  notifications: [
-    {
-      type: 'email',
-      smtp: {
-        host: 'smtp.qq.com',        // QQ Email SMTP server
-        port: 465,                  // SSL port
-        secure: true,               // Use SSL encryption
-        auth: {
-          user: 'your-qq-number@qq.com',  // Your QQ email (full email address)
-          pass: 'your-authorization-code' // QQ Email authorization code (NOT your login password!)
-        }
-      },
-      from: 'your-qq-number@qq.com',      // Sender email
-      to: ['recipient1@example.com', 'recipient2@example.com'], // Recipient list
-      subject: 'Vite Auto Deployment Notification', // Email subject
-      template: 'default'                 // Email template ('default' or 'simple')
-    }
-  ]
-}
-```
-
-
-**3. Secure Configuration with Environment Variables (Recommended)**
-
-To avoid hardcoding sensitive information in code, use environment variables:
-
-```js
-// vite.config.js
-const config = {
-  // ... other configurations
-  notifications: [
-    {
-      type: 'email',
-      smtp: {
-        host: 'smtp.qq.com',
-        port: 465,
-        secure: true,
-        auth: {
-          user: process.env.QQ_EMAIL_USER,     // Retrieved from environment variables
-          pass: process.env.QQ_EMAIL_PASSWORD  // Retrieved from environment variables
-        }
-      },
-      from: process.env.QQ_EMAIL_USER,
-      to: [process.env.DEPLOY_NOTIFY_EMAIL],
-      subject: 'Vite Auto Deployment Notification'
-    }
-  ]
-}
-```
-
-Configure in `.env.local` file (do not commit to version control):
-
-```
-# .env.local
-QQ_EMAIL_USER=your-qq-number@qq.com
-QQ_EMAIL_PASSWORD=your-16-digit-authorization-code
-DEPLOY_NOTIFY_EMAIL=dev-team@example.com,manager@example.com
-```
-
-**Email Template Options**
-- `default`: Professional HTML formatted email with complete deployment details and status indicators
-- `simple`: Simple text format email with basic information only
-
-**Important Notes**
-- The `pass` field for QQ Email must use the **authorization code**, not your QQ password
-- If the authorization code is compromised, you can regenerate it in QQ Email settings
-- It's recommended to use a dedicated QQ email account for deployment notifications, not your primary personal email
-- Email sending frequency is limited by QQ Email's sending limits (typically max 10 emails per minute)
-
-## 🎯 Advanced Features
-
-### Multi-server Configuration
-
-#### Environment-based Single Server Selection
-
-The plugin now supports **single server deployment from a configuration list**. When you provide an array of server configurations, the plugin will automatically find and deploy to the **first matching server** based on the current build environment (`--mode`), rather than deploying to all matching servers simultaneously.
-
-> **Important**: The `mode` parameter is now **required** for all deployment configurations. You must explicitly specify the deployment environment for each server configuration.
-
-This approach provides better control and prevents accidental multi-server deployments.
+#### Webhook Notifications
 
 ```javascript
-const multiEnvironmentConfig = [
-  // Staging environment - will be selected when --mode staging
-  {
-    name: 'Staging Server',
-    mode: 'staging',             // Required - specifies the target environment
-    host: '192.168.1.200',
-    path: '/var/www/staging'
-  },
-  // Production environment - will be selected when --mode production  
-  {
-    name: 'Production Server',
-    mode: 'production',          // Required - specifies the target environment
-    host: '192.168.1.100',
-    path: '/var/www/html'
-  },
-  // Additional production server (will not be deployed unless positioned earlier in the array)
-  {
-    name: 'Backup Production Server',
-    mode: 'production',          // Required - specifies the target environment
-    host: '192.168.1.101',
-    path: '/var/www/html'
+vitePluginAutoDeployer({
+  // ... other configurations
+  notifications: {
+    webhook: {
+      url: 'https://hooks.slack.com/services/...',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
   }
-]
-
-export default defineConfig({
-  plugins: [vue(), autoDeployer(multiEnvironmentConfig)]
 })
 ```
-
-**Deployment Behavior:**
-- When running `npm run build -- --mode staging`: Only deploys to "Staging Server"
-- When running `npm run build -- --mode production`: Only deploys to "Production Server" (the first match)
-- The "Backup Production Server" will only be deployed to if it appears before the main production server in the array
-
-#### Multi-server Parallel Deployment for Same Environment
-
-If you need true parallel deployment to multiple servers for the same environment, you can still achieve this by explicitly providing an array with multiple configurations that have the same `mode` value:
-
-```js
-// This will deploy to both servers simultaneously (same mode)
-const parallelProductionServers = [
-  {
-    name: 'Production Server 1',
-    mode: 'production',
-    host: '192.168.1.100',
-    path: '/var/www/html'
-  },
-  {
-    name: 'Production Server 2', 
-    mode: 'production',
-    host: '192.168.1.101',
-    path: '/var/www/html'
-  }
-]
-```
-
-However, the recommended approach is to use the single-server selection pattern for most use cases, as it provides clearer deployment intent and reduces the risk of accidental multi-server deployments.
-
-#### Single Mode, Multiple Servers
-
-```js
-const serverList = [
-  {
-    name: 'Web Server 1',
-    mode: 'production',
-    host: '192.168.1.101',
-    path: '/var/www/html'
-  },
-  {
-    name: 'Web Server 2',
-    mode: 'production',
-    host: '192.168.1.102',
-    path: '/var/www/html'
-  }
-]
-
-export default defineConfig({
-  plugins: [vue(), autoDeployer(serverList)]
-})
-```
-
-#### Multi-environment Configuration
-
-```js
-const multiEnvironmentConfig = [
-  // Staging environment
-  {
-    name: 'Staging Server',
-    mode: 'staging',
-    host: '192.168.1.200',
-    path: '/var/www/staging'
-  },
-  // Production environment
-  {
-    name: 'Production Server',
-    mode: 'production',
-    host: '192.168.1.100',
-    path: '/var/www/html'
-  }
-]
-```
-
-### Environment Auto-matching Advantages
-
-- **Intelligent Selection**: The plugin automatically selects the matching configuration based on the current build environment (`--mode` parameter or `NODE_ENV`)
-- **Simplified Configuration**: No need to maintain multiple configuration files for different environments; all configurations are managed centrally
-- **Secure Isolation**: Server configurations for different environments are completely isolated to prevent accidental operations
 
 ## 🔒 Security Guarantees
 
-### Path Security Validation
+### Password Security
+- Passwords are not stored in plain text in configuration files
+- Support for environment variables and key management services
+- Transmission encrypted using SSH
 
-The plugin includes strict path validation mechanisms to prevent dangerous operations:
+### Path Validation
+- Automatic detection of remote path security
+- Prevention of accidental deletion of important system directories
+- Support for whitelist and blacklist configurations
 
-**Blocked Dangerous Paths Include:**
-- Root directory (`/`)
-- System critical directories (`/bin`, `/etc`, `/usr`, `/var`, etc.)
-- Wildcard paths (`/*`, `/home/*`)
-- Any path that could potentially delete system files
-
-### Safe Directory Cleanup
-
-Employs safe file cleanup strategies, replacing dangerous `rm -rf` commands:
-
-```bash
-# Safe cleanup command
-find "${remotePath}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
-```
-
-**Advantages:**
-- Deletes only directory contents, preserving the directory itself
-- Limits deletion depth to prevent recursive accidental deletion
-- Properly handles permissions and error conditions
-
-### Authentication Security Best Practices
-
-1. **Avoid Password Hardcoding**: Never store plaintext passwords in configuration files
-2. **Interactive Input**: Enter sensitive information securely during deployment
-3. **Use Strong Passwords**: Ensure server passwords meet security requirements
+### Permission Control
+- Principle of minimum permissions
+- Support for separation of read and write permissions
+- Audit logging of all operations
 
 ## 📝 Logging & Monitoring
 
-### Logging Features
+### Log Levels
 
-**Default Status**: Disabled (requires explicit enabling)
+The plugin provides detailed logging output:
 
-**Enable Method**:
-```js
-{
-  enableLogging: true,
-  logDir: './custom-logs' // Optional: Custom log directory
-}
+```
+[INFO] Starting deployment to production environment
+[INFO] Connecting to server: example.com:22
+[INFO] Compressing file: dist/app.js -> dist/app.js.gz (reduced by 45%)
+[INFO] Uploading file: /dist/index.html (1/15)
+[INFO] Uploading file: /dist/app.js (2/15)
+...
+[INFO] Executing post-deployment command: pm2 restart my-app
+[SUCCESS] Deployment completed! Total time: 12.5 seconds
 ```
 
-**Log Format**: JSON format with complete deployment context information
+### Monitoring Metrics
 
-**Log Example**:
-```
-{
-  "timestamp": "2026-04-16T18:24:09.123Z",
-  "level": "DEPLOYMENT_START",
-  "deploymentId": "deploy-1681642754-abc123",
-  "config": {
-    "name": "Production Environment",
-    "mode": "production",
-    "host": "192.168.1.100",
-    "port": 22,
-    "path": "/var/www/html"
-  },
-  "environment": {
-    "nodeVersion": "v18.17.0",
-    "platform": "linux",
-    "cwd": "/home/user/my-project"
-  }
-}
-```
-
-### Notification Integration
-
-Supports multiple notification methods for real-time deployment status monitoring:
-
-- **Webhook**: Integrates with Slack, Discord, WeChat Work, etc.
-- **Email**: Sends detailed deployment reports
-- **Custom**: Extensible to other notification channels
+- Deployment success rate
+- Average deployment time
+- File transfer speed
+- Error statistics
 
 ## 🌐 Multilingual Support
 
-### Bilingual Message Display
+Plugin has built-in Chinese and English bilingual support:
 
-All prompt messages display both Chinese and English simultaneously, formatted as follows:
-
-```
-🚀 开始部署到: 生产环境 (production)
-🚀 Starting deployment to: Production Environment (production)
-```
-
-**Advantages:**
-- Global developers can understand deployment information
-- No need to configure language environment
-- Enhances international team collaboration experience
+- **Chinese**: Complete Chinese interface and prompts
+- **English**: Complete English interface and prompts
+- **Auto-detection**: Automatically switches based on system language
 
 ## ⚡ Performance & Reliability
 
-### Error Handling
+### Performance Optimization
 
-- **Graceful Degradation**: Deployment failures won't interrupt the build process
-- **Detailed Error Information**: Provides clear error descriptions and solutions
-- **Retry Friendly**: Supports manual redeployment
+- **Concurrent Uploads**: Support multi-threaded file uploads
+- **File Compression**: Gzip compression reduces transmission volume
+- **Incremental Deployment**: Only upload changed files
+- **Connection Pooling**: SSH connection pool management
 
-### Resource Management
+### Reliability Guarantee
 
-- **Connection Reuse**: Optimized SSH connection management
-- **Memory Efficiency**: Lightweight implementation that doesn't impact build performance
-- **Timeout Control**: Configurable connection and operation timeout settings
+- **Retry Mechanism**: Automatic retry on network exceptions
+- **Transactional Deployment**: Automatic rollback on deployment failure
+- **Health Checks**: Server status check before deployment
+- **Timeout Control**: Prevent deployment process from hanging
 
 ## 🛠️ Troubleshooting
 
 ### Common Issues
 
 #### Connection Failed
-- **Check Network**: Ensure the build machine can access the target server
-- **Verify Credentials**: Confirm SSH credentials are correct
-- **Port Open**: Ensure SSH port (default 22) is open
 
-#### Path Validation Failed
-- **Use Absolute Paths**: Avoid relative paths
-- **Avoid System Directories**: Use application-specific directories
-- **Permission Check**: Ensure target directory is writable
+```
+Error: connect ECONNREFUSED 127.0.0.1:22
+```
 
-### Debugging Tips
+**Solutions**:
+1. Check server address and port
+2. Confirm SSH service is running
+3. Check firewall settings
 
-```bash
-# Enable detailed logging
-enableLogging: true
+#### Permission Denied
 
-# Increase connection timeout
-readyTimeout: 10000 // 10 seconds
+```
+Error: EACCES: permission denied
+```
 
-# Test single server configuration
-// Temporarily comment out other server configurations
+**Solutions**:
+1. Check SSH user permissions
+2. Confirm remote path permissions
+3. Use correct user identity
+
+#### File Upload Failed
+
+```
+Error: No such file or directory
+```
+
+**Solutions**:
+1. Check local build output directory
+2. Confirm file paths are correct
+3. Check disk space
+
+### Debug Mode
+
+Enable detailed logging:
+
+```javascript
+vitePluginAutoDeployer({
+  // ... other configurations
+  debug: true
+})
 ```
 
 ## 📋 Best Practices
 
-### Secure Configuration
+### Production Environment Configuration
 
-```js
-// Recommended secure configuration example
-const secureConfig = {
-  name: 'Production Server',
-  mode: 'production',
-  host: 'your-server.com',
-  username: 'deploy',
-  path: '/opt/app/production',
-  beforeDeploy: 'pm2 stop app || true',
-  afterDeploy: 'npm install --production && pm2 start app.js',
-  enableLogging: true,
-  notifications: [
-    {
-      type: 'webhook',
-      url: process.env.DEPLOY_WEBHOOK_URL
-    }
+```javascript
+// vite.config.js
+export default defineConfig({
+  build: {
+    outDir: 'dist'
+  },
+  plugins: [
+    vitePluginAutoDeployer({
+      production: {
+        host: process.env.DEPLOY_HOST,
+        username: process.env.DEPLOY_USER,
+        password: process.env.DEPLOY_PASS,
+        remotePath: '/var/www/production',
+        preDeploy: 'pm2 stop my-app',
+        postDeploy: 'pm2 start my-app && pm2 save',
+        concurrency: 5,
+        compress: true
+      }
+    })
   ]
-}
+})
 ```
 
-### Environment Separation
+### CI/CD Integration
 
-- **Development Environment**: No deployment configuration, or explicitly set `mode: 'development'`
-- **Staging Environment**: Use separate staging servers and configurations
-- **Production Environment**: Use the most stringent security configurations and monitoring
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [ main ]
 
-### Version Control
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run build
+      - run: npm run deploy:production
+```
 
-- **Don't Commit Sensitive Information**: Add log directories to `.gitignore`
-- **Configuration Templates**: Provide `vite.config.example.js` as a template
-- **Environment Variables**: Inject sensitive configurations through environment variables
+### Security Configuration
 
-### Community Contributions
+```javascript
+// Use environment variables
+vitePluginAutoDeployer({
+  host: process.env.DEPLOY_HOST,
+  username: process.env.DEPLOY_USER,
+  password: process.env.DEPLOY_PASSWORD,
+  remotePath: process.env.DEPLOY_PATH
+})
+```
 
-We welcome Issues and Pull Requests! We look forward to your valuable suggestions and code contributions.
+## 🤝 Contributing
 
----
+Welcome to submit Issues and Pull Requests!
 
-**Happy Deploying!** 🎉
+### Development Environment Setup
 
-⭐ If this plugin has been helpful to you, please give the project a Star!
+```bash
+# Clone the project
+git clone https://github.com/your-username/vite-plugin-auto-deployer.git
+cd vite-plugin-auto-deployer
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Code checking
+npm run lint
+```
+
+### Commit Conventions
+
+- `feat:` New features
+- `fix:` Bug fixes
+- `docs:` Documentation updates
+- `style:` Code formatting
+- `refactor:` Code refactoring
+- `test:` Test-related changes
+- `chore:` Build-related changes
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) file for details
+
+## 🙏 Acknowledgments
+
+Thanks to all contributors and users! This project is dedicated to simplifying frontend deployment workflows, allowing developers to focus on creating better products.
