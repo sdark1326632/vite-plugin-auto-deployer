@@ -1,4 +1,4 @@
-const path = require('path');
+﻿const path = require("path");
 
 /**
  * 危险路径模式（更严格的验证）
@@ -17,12 +17,17 @@ const DANGEROUS_PATH_PATTERNS = [
  * @returns {boolean} - 是否为危险路径
  */
 function isDangerousPath(remotePath) {
-  if (!remotePath || typeof remotePath !== 'string') {
+  if (!remotePath || typeof remotePath !== "string") {
     return true;
   }
 
   // 规范化路径（移除末尾斜杠）
-  const normalizedPath = remotePath.replace(/\/+$/, '');
+  const normalizedPath = remotePath.replace(/\/+$/, "");
+  
+  // 空路径或根目录都是危险的
+  if (!normalizedPath) {
+    return true;
+  }
 
   // 检查是否包含危险模式
   return DANGEROUS_PATH_PATTERNS.some((pattern) => pattern.test(normalizedPath));

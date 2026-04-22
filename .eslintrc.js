@@ -1,7 +1,7 @@
 ﻿module.exports = {
   env: {
     node: true,
-    es2021: true,
+    es6: true,
   },
   extends: [
     "eslint:recommended",
@@ -9,18 +9,18 @@
     "prettier",
   ],
   parserOptions: {
-    ecmaVersion: 12,
-    sourceType: "module",
+    ecmaVersion: 2018,
   },
   rules: {
     "node/no-missing-import": "off",
     "node/no-unsupported-features/es-syntax": "off",
-    "node/no-unsupported-features/node-builtins": ["error", { version: ">=14.0.0" }],
-    "node/no-unsupported-features/es-builtins": ["error", { version: ">=14.0.0" }],
+    "node/no-unsupported-features/node-builtins": "off",
+    "node/no-unsupported-features/es-builtins": "off",
     "node/no-deprecated-api": "warn",
     "node/no-extraneous-require": "off",
     "no-unused-vars": "warn",
     "no-console": "off",
     "no-async-promise-executor": "warn",
+    "no-undef": "off",
   },
 };
